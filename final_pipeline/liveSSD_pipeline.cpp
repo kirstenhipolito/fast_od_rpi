@@ -3,6 +3,10 @@
 #include <raspicam/raspicam_cv.h>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/core/matx.hpp>
+#include "tensorflow/lite/interpreter.h"
+#include "tensorflow/lite/kernels/register.h"
+#include "tensorflow/lite/model.h"
+#include "tensorflow/lite/optional_debug_tools.h"
 using namespace std;
 
 vector<uint8_t> convert_mat(cv::Mat input, int height, int width,int channels)
@@ -64,7 +68,7 @@ int main (int argc, char **argv)
   //Proper pipeline
   while(1){
     Camera.grab();
-		Camera.retrieve(image);
+    Camera.retrieve(image);
     cv::resize(image, resized, cv::Size(width,height));
 
     //Convert Mat resized to std::vector<uin8_t> to make compatible w/ tflite
@@ -75,7 +79,7 @@ int main (int argc, char **argv)
     **/
 
     //To do: Draw bounding boxes on resized
-		cv::imshow("Camera View",resized);
+    cv::imshow("Camera View",resized);
 
     char c = cv::waitKey(1);
     if(c == 27) break;
