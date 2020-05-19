@@ -1,3 +1,0 @@
-/home/pi/Documents/EEE190/fast_od_rpi/final_pipeline/build/CMakeFiles/rebuild_cache.dir
-/home/pi/Documents/EEE190/fast_od_rpi/final_pipeline/build/CMakeFiles/liveSSD_pipeline.dir
-/home/pi/Documents/EEE190/fast_od_rpi/final_pipeline/build/CMakeFiles/edit_cache.dir
