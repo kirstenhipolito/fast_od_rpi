@@ -7,11 +7,12 @@
 #include "tensorflow/lite/kernels/register.h"
 #include "tensorflow/lite/model.h"
 #include "tensorflow/lite/optional_debug_tools.h"
-using namespace std;
 
-vector<uint8_t> convert_mat(cv::Mat input, int height, int width,int channels)
+using namespace tflite;
+
+std::vector<uint8_t> convert_mat(cv::Mat input, int height, int width,int channels)
 {
-  vector<uint8_t> output(height * width * channels);
+  std::vector<uint8_t> output(height * width * channels);
 
   for(int i = 0; i < height; i++){
     int des_pos;
@@ -42,14 +43,14 @@ int main (int argc, char **argv)
   //camera currently set to capture frames of BGR color matrix format
   Camera.set( cv::CAP_PROP_FORMAT, CV_8UC3 );
 
-  cout<<"Opening Camera..."<<endl;
+  std::cout<< "Opening Camera..." << "\n";
 	if (!Camera.open()) {
-    cerr<<"Error opening the camera"<<endl;
+    std::cerr<<"Error opening the camera"<< "\n";
     return -1;
   }
 
-  cout << "Starting display..."<< endl;
-  cout << "Press ESC to begin bounding box prediction." << endl;
+  std::cout << "Starting display..."<< "\n";
+  std::cout << "Press ESC to begin bounding box prediction." << "\n";
 
   cv::namedWindow("Camera View", cv::WINDOW_AUTOSIZE);
 
@@ -63,7 +64,7 @@ int main (int argc, char **argv)
     if(c == 27) break;
 
   }
-  cout << "Press ESC to end." << endl;
+  std::cout << "Press ESC to end." << "\n";
 
   //Proper pipeline
   while(1){
@@ -72,7 +73,7 @@ int main (int argc, char **argv)
     cv::resize(image, resized, cv::Size(width,height));
 
     //Convert Mat resized to std::vector<uin8_t> to make compatible w/ tflite
-    vector<uint8_t> input = convert_mat(resized,height,width,channels);
+    std::vector<uint8_t> input = convert_mat(resized,height,width,channels);
 
     /**
         TFLITE INFERENCE METHOD CALL HERE.
