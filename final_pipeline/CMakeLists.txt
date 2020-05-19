@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 2.8)
+cmake_minimum_required (VERSION 3.13)
 project (final_pipeline)
 list(APPEND CMAKE_MODULE_PATH "/home/pi/Documents/EEE190/raspicam-0.1.6/build")
 find_package(raspicam REQUIRED)
