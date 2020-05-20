@@ -17,27 +17,25 @@ using namespace tflite;
     exit(1);                                                 \
   }
 
-std::vector<uint8_t> convert_mat(cv::Mat input, int height, int width,int channels)
+void fill_buffer_with_mat(cv::Mat input, float* to_inp, int height, int width,int channels)
 {
-  std::vector<uint8_t> output(height * width * channels);
-
+  //UNOPTIMIZED
+  //To do: Find a memcpy version of this
   for(int i = 0; i < height; i++){
     int des_pos;
     for(int j = 0; j < width; j++){
       des_pos = (i * width + j) * channels;
-
       cv::Vec3b intensity = input.at<cv::Vec3b>(i, j);
-      output[des_pos] = (uint8_t) intensity.val[2]; //R
-      output[des_pos+1] = (uint8_t)intensity.val[1]; //G
-      output[des_pos+2] = (uint8_t) intensity.val[0]; //B
+      to_inp[des_pos] = intensity.val[2] / 255.0f; //R
+      to_inp[des_pos+1] = intensity.val[1] / 255.0f; //G
+      to_inp[des_pos+2] = intensity.val[0] / 255.0f; //B
     }
   }
-
-  return output;
 }
 
 int main (int argc, char **argv)
 {
+  //Usage if in the Build Folder: liveSSD_pipeline ../<model name>.tflite
   if (argc != 2) {
     fprintf(stderr, "liveSSD_pipeline <tflite model relative path>\n");
     return 1;
@@ -48,8 +46,8 @@ int main (int argc, char **argv)
 	raspicam::RaspiCam_Cv Camera;
 	cv::Mat image;
   cv::Mat resized;
-  int height = 480;
-  int width = 640;
+  int height = 300;
+  int width = 300;
   int channels = 3;
 
   // Load model
@@ -66,6 +64,7 @@ int main (int argc, char **argv)
   // Allocate tensor buffers.
   TFLITE_MINIMAL_CHECK(interpreter->AllocateTensors() == kTfLiteOk);
 
+  //show empty output tensor (use for debugging)
   printf("=== Pre-invoke Interpreter Output State (first 6 rows) ===\n");
   int pre_out_idx = interpreter->outputs()[0];
   float* pre_out = interpreter->typed_tensor<float>(pre_out_idx);
@@ -75,6 +74,10 @@ int main (int argc, char **argv)
       std::cout << "\n";
     }
   }
+
+  //get pointer to input tensor
+  int input = interpreter->inputs()[0];
+  float* to_inp = interpreter->typed_tensor<float>(input);
 
 
   //camera currently set to capture frames of BGR color matrix format
@@ -109,14 +112,20 @@ int main (int argc, char **argv)
     Camera.retrieve(image);
     cv::resize(image, resized, cv::Size(width,height));
 
-    //Convert Mat resized to std::vector<uin8_t> to make compatible w/ tflite
-    std::vector<uint8_t> input = convert_mat(resized,height,width,channels);
+    //Fill model input buffers with captured Mat frames
+    fill_buffer_with_mat(resized,to_inp,height,width,channels);
 
-    /**
-        TFLITE INFERENCE METHOD CALL HERE.
-    **/
+    //Run inference
+    TFLITE_MINIMAL_CHECK(interpreter->Invoke() == kTfLiteOk);
 
+    //Get pointer to output tensor
+    int output_idx = interpreter->outputs()[0];
+    float* output = interpreter->typed_tensor<float>(output_idx);
+
+    //To do: Grab output predictions and feed to NMS
+    //To do: Use NMS to cut down number of bounding boxes
     //To do: Draw bounding boxes on resized
+
     cv::imshow("Camera View",resized);
 
     char c = cv::waitKey(1);
