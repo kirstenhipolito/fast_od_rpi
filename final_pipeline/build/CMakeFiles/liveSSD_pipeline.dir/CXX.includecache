@@ -11,6 +11,8 @@ ctime
 -
 iostream
 -
+cstdio
+-
 raspicam/raspicam_cv.h
 -
 opencv2/imgproc.hpp

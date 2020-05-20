@@ -1,5 +1,6 @@
 #include <ctime>
 #include <iostream>
+#include <cstdio>
 #include <raspicam/raspicam_cv.h>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/core/matx.hpp>
@@ -9,6 +10,12 @@
 #include "tensorflow/lite/optional_debug_tools.h"
 
 using namespace tflite;
+
+#define TFLITE_MINIMAL_CHECK(x)                              \
+  if (!(x)) {                                                \
+    fprintf(stderr, "Error at %s:%d\n", __FILE__, __LINE__); \
+    exit(1);                                                 \
+  }
 
 std::vector<uint8_t> convert_mat(cv::Mat input, int height, int width,int channels)
 {
@@ -31,6 +38,12 @@ std::vector<uint8_t> convert_mat(cv::Mat input, int height, int width,int channe
 
 int main (int argc, char **argv)
 {
+  if (argc != 2) {
+    fprintf(stderr, "liveSSD_pipeline <tflite model relative path>\n");
+    return 1;
+  }
+
+  const char* filename = argv[1];
   time_t timer_begin,timer_end;
 	raspicam::RaspiCam_Cv Camera;
 	cv::Mat image;
@@ -39,11 +52,35 @@ int main (int argc, char **argv)
   int width = 640;
   int channels = 3;
 
+  // Load model
+  std::unique_ptr<tflite::FlatBufferModel> model = tflite::FlatBufferModel::BuildFromFile(filename);
+  TFLITE_MINIMAL_CHECK(model != nullptr);
+
+  // Build the interpreter
+  tflite::ops::builtin::BuiltinOpResolver resolver;
+  InterpreterBuilder builder(*model, resolver);
+  std::unique_ptr<Interpreter> interpreter;
+  builder(&interpreter);
+  TFLITE_MINIMAL_CHECK(interpreter != nullptr);
+
+  // Allocate tensor buffers.
+  TFLITE_MINIMAL_CHECK(interpreter->AllocateTensors() == kTfLiteOk);
+
+  printf("=== Pre-invoke Interpreter Output State (first 6 rows) ===\n");
+  int pre_out_idx = interpreter->outputs()[0];
+  float* pre_out = interpreter->typed_tensor<float>(pre_out_idx);
+  for(int n = 0; n < (6 * 33); n++){
+    std::cout << pre_out[n] << " ";
+    if((n%33 == 0) && (n != 0)){
+      std::cout << "\n";
+    }
+  }
+
 
   //camera currently set to capture frames of BGR color matrix format
   Camera.set( cv::CAP_PROP_FORMAT, CV_8UC3 );
 
-  std::cout<< "Opening Camera..." << "\n";
+  std::cout<< "\nOpening Camera..." << "\n";
 	if (!Camera.open()) {
     std::cerr<<"Error opening the camera"<< "\n";
     return -1;
