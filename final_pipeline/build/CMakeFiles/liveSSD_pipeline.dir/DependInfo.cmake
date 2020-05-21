@@ -11,6 +11,8 @@ set(CMAKE_CXX_COMPILER_ID "GNU")
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
   "/usr/local/include"
+  "/home/pi/Documents/EEE190/tensorflow/tensorflow/lite/tools/make/downloads/flatbuffers/include"
+  "/home/pi/Documents/EEE190/tensorflow"
   "/opt/opencv-4.1.0/include/opencv4"
   )
 

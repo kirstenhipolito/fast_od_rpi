@@ -109,6 +109,7 @@ liveSSD_pipeline: /opt/opencv-4.1.0/lib/libopencv_videostab.so.4.1.0
 liveSSD_pipeline: /opt/opencv-4.1.0/lib/libopencv_xfeatures2d.so.4.1.0
 liveSSD_pipeline: /opt/opencv-4.1.0/lib/libopencv_xobjdetect.so.4.1.0
 liveSSD_pipeline: /opt/opencv-4.1.0/lib/libopencv_xphoto.so.4.1.0
+liveSSD_pipeline: /home/pi/Documents/EEE190/tensorflow/tensorflow/lite/tools/make/gen/rpi_armv7l/lib/libtensorflow-lite.a
 liveSSD_pipeline: /opt/opencv-4.1.0/lib/libopencv_shape.so.4.1.0
 liveSSD_pipeline: /opt/opencv-4.1.0/lib/libopencv_datasets.so.4.1.0
 liveSSD_pipeline: /opt/opencv-4.1.0/lib/libopencv_plot.so.4.1.0
