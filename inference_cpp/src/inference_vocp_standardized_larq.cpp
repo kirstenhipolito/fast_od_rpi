@@ -151,7 +151,7 @@ int main(int argc, char* argv[]) {
         
         if (image.empty()) {
             std::cout << "Could not read the image: " << img_path << std::endl;
-            return 1;
+            continue;
         }
         
         cv::resize(image, resized, cv::Size(image_width,image_height));
@@ -163,7 +163,7 @@ int main(int argc, char* argv[]) {
         TFLITE_MINIMAL_CHECK(interpreter->Invoke() == kTfLiteOk);
         // printf("\n\n=== Post-invoke Interpreter State ===\n");
         // tflite::PrintInterpreterState(interpreter.get());
-        printf("Done invoking.\n");
+        std::cout << "Done invoking for image " << ++i << std::endl;
 
         float* output = interpreter->typed_output_tensor<float>(0);
 
@@ -175,8 +175,7 @@ int main(int argc, char* argv[]) {
         
         // Read output buffers
         // TODO(user): Insert getting data out code.
-        i++;
-
+        
         if (i > 25) {
             break;
         }
