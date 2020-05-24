@@ -142,11 +142,13 @@ int main(int argc, char* argv[]) {
     while(file >> row)
     {
         img_path = img_directory + row[0];
-        std::cout << img_path << "\n" << std::endl;
+        std::cout << img_path << std::endl;
+
         time_req_1 = clock();
 
         // Fill input buffers
         // resize image and load into input  
+        image = cv::Mat();
         image = imread(img_path, cv::IMREAD_COLOR);
         
         if (image.empty()) {
