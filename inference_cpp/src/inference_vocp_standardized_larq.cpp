@@ -142,7 +142,7 @@ int main(int argc, char* argv[]) {
     while(file >> row)
     {
         img_path = img_directory + row[0];
-
+        std::cout << img_path << "\n" << std::endl;
         time_req_1 = clock();
 
         // Fill input buffers
