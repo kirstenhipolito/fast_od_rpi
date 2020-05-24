@@ -108,6 +108,7 @@ int main(int argc, char* argv[]) {
     string img_directory = "../../datasets/VOCdevkit_test/VOC2007/JPEGImages/";
     string img_csv = "../../ssd-keras/dataset_voc_csv/2007_person_test.csv";
     string img_path = "../../datasets/VOCdevkit_test/VOC2007/JPEGImages/000043.jpg";
+    string full_path = "";
 
     std::ifstream file(img_csv);
     CSVRow row;
