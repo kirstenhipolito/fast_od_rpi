@@ -31,23 +31,20 @@ using namespace cv;
     exit(1);                                                 \
   }
 
-std::vector<uint8_t> convert_mat(cv::Mat input, int height, int width,int channels)
+void fill_buffer_with_mat(cv::Mat input, float* to_inp, int height, int width,int channels)
 {
-    std::vector<uint8_t> output(height * width * channels);
-
-    for(int i = 0; i < height; i++){
-        int des_pos;
-        for(int j = 0; j < width; j++){
-        des_pos = (i * width + j) * channels;
-
-        cv::Vec3b intensity = input.at<cv::Vec3b>(i, j);
-        output[des_pos] = (uint8_t) intensity.val[2]; //R
-        output[des_pos+1] = (uint8_t)intensity.val[1]; //G
-        output[des_pos+2] = (uint8_t) intensity.val[0]; //B
-        }
+  //UNOPTIMIZED
+  //To do: Find a memcpy version of this
+  for(int i = 0; i < height; i++){
+    int des_pos;
+    for(int j = 0; j < width; j++){
+      des_pos = (i * width + j) * channels;
+      cv::Vec3b intensity = input.at<cv::Vec3b>(i, j);
+      to_inp[des_pos] = intensity.val[2] / 255.0f; //R
+      to_inp[des_pos+1] = intensity.val[1] / 255.0f; //G
+      to_inp[des_pos+2] = intensity.val[0] / 255.0f; //B
     }
-
-    return output;
+  }
 }
 
 class CSVRow
@@ -107,16 +104,11 @@ int main(int argc, char* argv[]) {
 
     string img_directory = "../../datasets/VOCdevkit_test/VOC2007/JPEGImages/";
     string img_csv = "../../ssd-keras/dataset_voc_csv/2007_person_test.csv";
-    string img_path = "../../datasets/VOCdevkit_test/VOC2007/JPEGImages/000043.jpg";
-    string full_path = "";
+    // string img_path = "../../datasets/VOCdevkit_test/VOC2007/JPEGImages/000043.jpg";
+    string img_path = "";
 
     std::ifstream file(img_csv);
     CSVRow row;
-    while(file >> row)
-    {
-        full_path = img_directory + row[0];
-        std::cout << full_path << std::endl;
-    }
 
     // Load model
     std::unique_ptr<tflite::FlatBufferModel> model = tflite::FlatBufferModel::BuildFromFile(filename);
@@ -137,48 +129,59 @@ int main(int argc, char* argv[]) {
     interpreter->SetNumThreads(4);
     // interpreter->SetAllowFp16PrecisionForFp32(true);
 
-    time_req_1 = clock();
-
     // Fill 'input'.
-    float* input = interpreter->typed_input_tensor<float>(0);
+    float* to_inp = interpreter->typed_input_tensor<float>(0);
 
     // Allocate tensor buffers.
     TFLITE_MINIMAL_CHECK(interpreter->AllocateTensors() == kTfLiteOk);
     // printf("=== Pre-invoke Interpreter State ===\n");
     // tflite::PrintInterpreterState(interpreter.get());
 
-    // Fill input buffers
-    // resize image and load into input  
-    image = imread(img_path, cv::IMREAD_COLOR);
-    
-    if(image.empty())
+    int i = 0;
+
+    while(file >> row)
     {
-        std::cout << "Could not read the image: " << img_path << std::endl;
-        return 1;
+        img_path = img_directory + row[0];
+
+        time_req_1 = clock();
+
+        // Fill input buffers
+        // resize image and load into input  
+        image = imread(img_path, cv::IMREAD_COLOR);
+        
+        if (image.empty()) {
+            std::cout << "Could not read the image: " << img_path << std::endl;
+            return 1;
+        }
+        
+        cv::resize(image, resized, cv::Size(image_width,image_height));
+        fill_buffer_with_mat(resized,to_inp,image_height,image_width,image_channels);
+        
+        time_req_2 = clock();
+
+        // Run inference
+        TFLITE_MINIMAL_CHECK(interpreter->Invoke() == kTfLiteOk);
+        // printf("\n\n=== Post-invoke Interpreter State ===\n");
+        // tflite::PrintInterpreterState(interpreter.get());
+        printf("Done invoking.\n");
+
+        float* output = interpreter->typed_output_tensor<float>(0);
+
+        time_req_1 = clock() - time_req_1;
+        time_req_2 = clock() - time_req_2;
+
+        cout << "Loading image and inference of model took " << (float)time_req_1/CLOCKS_PER_SEC << " seconds, or equivalent FPS of " << CLOCKS_PER_SEC/(float)time_req_1 << endl;
+        cout << "Only inference of model took " << (float)time_req_2/CLOCKS_PER_SEC << " seconds, or equivalent FPS of " << CLOCKS_PER_SEC/(float)time_req_2 << endl;
+        
+        // Read output buffers
+        // TODO(user): Insert getting data out code.
+        i++;
+
+        if (i > 25) {
+            break;
+        }
     }
-
-    cv::resize(image, resized, cv::Size(image_width,image_height));
-    memcpy(interpreter->typed_input_tensor<float>(0), resized.data, resized.total() * resized.elemSize());
-	
     
-    time_req_2 = clock();
-
-    // Run inference
-    TFLITE_MINIMAL_CHECK(interpreter->Invoke() == kTfLiteOk);
-    // printf("\n\n=== Post-invoke Interpreter State ===\n");
-    // tflite::PrintInterpreterState(interpreter.get());
-    printf("Done invoking.\n");
-
-    float* output = interpreter->typed_output_tensor<float>(0);
-
-    time_req_1 = clock() - time_req_1;
-    time_req_2 = clock() - time_req_2;
-
-    cout << "Loading image and inference of model took " << (float)time_req_1/CLOCKS_PER_SEC << " seconds, or equivalent FPS of " << CLOCKS_PER_SEC/(float)time_req_1 << endl;
-    cout << "Only inference of model took " << (float)time_req_2/CLOCKS_PER_SEC << " seconds, or equivalent FPS of " << CLOCKS_PER_SEC/(float)time_req_2 << endl;
-
-    // Read output buffers
-    // TODO(user): Insert getting data out code.
 
     return 0;
 }
