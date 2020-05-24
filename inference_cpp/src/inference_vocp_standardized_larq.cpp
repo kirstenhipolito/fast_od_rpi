@@ -13,7 +13,6 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
-#include <boost/filesystem.hpp>
 
 #include "lib/decode_detections.hpp"
 #include "larq_compute_engine/tflite/kernels/lce_ops_register.h"
@@ -106,18 +105,15 @@ int main(int argc, char* argv[]) {
     int image_channels = 3;
     clock_t time_req, time_req_1, time_req_2;
 
-    //   string img_directory = "~";
+    string img_directory = "../../datasets/VOCdevkit_test/VOC2007/JPEGImages/";
     string img_csv = "../../ssd-keras/dataset_voc_csv/2007_person_test.csv";
     string img_path = "../../datasets/VOCdevkit_test/VOC2007/JPEGImages/000043.jpg";
 
-    boost::filesystem::path img_directory ("../../datasets/VOCdevkit_test/VOC2007/JPEGImages");
-    boost::filesystem::path full_path
     std::ifstream file(img_csv);
     CSVRow row;
     while(file >> row)
     {
-        boost::filesystem::path file(row[0]);
-        full_path = img_directory / file;
+        full_path = img_directory + row[0];
         std::cout << full_path << std::endl;
     }
 
