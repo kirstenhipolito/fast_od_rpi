@@ -9,6 +9,10 @@
 #include <ctime>
 #include <cmath>
 #include <string>
+#include <iterator>
+#include <fstream>
+#include <sstream>
+#include <vector>
 
 #include "decode_detections.hpp"
 #include "larq_compute_engine/tflite/kernels/lce_ops_register.h"
@@ -46,21 +50,46 @@ std::vector<uint8_t> convert_mat(cv::Mat input, int height, int width,int channe
     return output;
 }
 
-void ProcessInputWithFloatModel(uint8_t* input, float* buffer) {
-    const int wanted_input_height = 300;
-    const int wanted_input_width = 300;
-    const int wanted_input_channels = 300;
-    for (int y = 0; y < wanted_input_height; ++y) {
-        float* out_row = buffer + (y * wanted_input_width * wanted_input_channels);
-        for (int x = 0; x < wanted_input_width; ++x) {
-            uint8_t* input_pixel = input + (y * wanted_input_width * wanted_input_channels) + (x * wanted_input_channels);
-            float* out_pixel = out_row + (x * wanted_input_channels);
-            for (int c = 0; c < wanted_input_channels; ++c) {
-                out_pixel[c] = input_pixel[c] / 255.0f;
+class CSVRow
+{
+    public:
+        std::string const& operator[](std::size_t index) const
+        {
+            return m_data[index];
+        }
+        std::size_t size() const
+        {
+            return m_data.size();
+        }
+        void readNextRow(std::istream& str)
+        {
+            std::string         line;
+            std::getline(str, line);
+
+            std::stringstream   lineStream(line);
+            std::string         cell;
+
+            m_data.clear();
+            while(std::getline(lineStream, cell, ','))
+            {
+                m_data.push_back(cell);
+            }
+            // This checks for a trailing comma with no data after it.
+            if (!lineStream && cell.empty())
+            {
+                // If there was a trailing comma then add an empty element.
+                m_data.push_back("");
             }
         }
-    }
-}
+    private:
+        std::vector<std::string>    m_data;
+};
+
+std::istream& operator>>(std::istream& str, CSVRow& data)
+{
+    data.readNextRow(str);
+    return str;
+}  
 
 int main(int argc, char* argv[]) {
     if (argc != 1) {
@@ -77,8 +106,15 @@ int main(int argc, char* argv[]) {
     clock_t time_req, time_req_1, time_req_2;
 
     //   string img_directory = "~/datasets/VOCdevkit_test/VOC2007/JPEGImages";
-    //   string img_csv = "~/ssd-keras/dataset_voc_csv/2007_person_test.csv"
+    string img_csv = "../../ssd-keras/dataset_voc_csv/2007_person_test.csv"
     string img_path = "../../datasets/VOCdevkit_test/VOC2007/JPEGImages/000043.jpg";
+
+    std::ifstream file(img_csv);
+    CSVRow row;
+    while(file >> row)
+    {
+        std::cout << "Image path" << row[0] << "\n";
+    }
 
     // Load model
     std::unique_ptr<tflite::FlatBufferModel> model = tflite::FlatBufferModel::BuildFromFile(filename);
@@ -96,6 +132,9 @@ int main(int argc, char* argv[]) {
     builder(&interpreter);
     TFLITE_MINIMAL_CHECK(interpreter != nullptr);
 
+    interpreter->SetNumThreads(4);
+    // interpreter->SetAllowFp16PrecisionForFp32(true);
+
     time_req_1 = clock();
 
     // Fill 'input'.
@@ -105,8 +144,6 @@ int main(int argc, char* argv[]) {
     TFLITE_MINIMAL_CHECK(interpreter->AllocateTensors() == kTfLiteOk);
     // printf("=== Pre-invoke Interpreter State ===\n");
     // tflite::PrintInterpreterState(interpreter.get());
-
-    interpreter->SetNumThreads(4);
 
     // Fill input buffers
     // resize image and load into input  
@@ -119,14 +156,8 @@ int main(int argc, char* argv[]) {
     }
 
     cv::resize(image, resized, cv::Size(image_width,image_height));
-    // std::vector<uint8_t> converted_input = convert_mat(resized,image_height,image_width,image_channels);
-    // uint8_t* in = image.ptr<uint8_t>(0);
-    // ProcessInputWithFloatModel(in, input);
-    
-   
-
     memcpy(interpreter->typed_input_tensor<float>(0), resized.data, resized.total() * resized.elemSize());
-	// interpreter->SetAllowFp16PrecisionForFp32(true);
+	
     
     time_req_2 = clock();
 
