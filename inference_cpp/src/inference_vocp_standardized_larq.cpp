@@ -14,7 +14,7 @@
 #include <sstream>
 #include <vector>
 
-#include "lib/decode_detections.hpp"
+#include "decode_detections.hpp"
 #include "larq_compute_engine/tflite/kernels/lce_ops_register.h"
 #include "tensorflow/lite/interpreter.h"
 #include "tensorflow/lite/kernels/register.h"
