@@ -12,8 +12,10 @@ using namespace Eigen;
 
 void draw_bounding_boxes(cv::Mat input, const Ref<const MatrixXf>& boxes)
 {
+  //get number of bounding boxes
   int num_boxes = boxes.rows();
 
+  //draw all boxes on image (all red boxes for now)
   for (int i = 0; i < num_boxes; i++)
   {
     cv::Point topleft = cv::Point(boxes(i,2),boxes(i,3));
@@ -57,7 +59,10 @@ int main()
   MatrixXf vec_boxes = decode_detections(y_pred, 0.3, 0.45, 4, 300, 300);
   cout << "vec_boxes:\n" << vec_boxes << endl;
 
+  //get copy of resized image for comparison
   cv::Mat original_img = resized.clone();
+
+  //draw boxes on resized
   draw_bounding_boxes(resized,vec_boxes);
 
   cv::namedWindow("original resized", cv::WINDOW_AUTOSIZE);
