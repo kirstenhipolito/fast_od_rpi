@@ -151,7 +151,6 @@ int main(int argc, char* argv[]) {
     for (int i = 0; i < num_runs; i++) {
         file >> row;
         img_path = img_directory + row[0];
-        // std::cout << img_path.c_str() << std::endl;
 
         time_req_1 = clock(); //time_req_1 -> ave_inference_ms
 
@@ -167,19 +166,17 @@ int main(int argc, char* argv[]) {
 
         // Run inference
         TFLITE_MINIMAL_CHECK(interpreter->Invoke() == kTfLiteOk);
-        // printf("\n\n=== Post-invoke Interpreter State ===\n");
-        // tflite::PrintInterpreterState(interpreter.get());
 
         float* output = interpreter->typed_output_tensor<float>(0);
 
         time_req_1 = clock() - time_req_1;
         time_req_2 = clock() - time_req_2;
 
-        // cout << "Loading image and inference of model took " << (float)time_req_1/CLOCKS_PER_SEC << " seconds, or equivalent FPS of " << CLOCKS_PER_SEC/(float)time_req_1 << endl;
-        // cout << "Only inference of model took " << (float)time_req_2/CLOCKS_PER_SEC << " seconds, or equivalent FPS of " << CLOCKS_PER_SEC/(float)time_req_2 << endl;
-        std::cout << row[0] << "  |  " << (float)time_req_1*1000/CLOCKS_PER_SEC << "  |  " << (float)time_req_2*1000/CLOCKS_PER_SEC << "  |  " << CLOCKS_PER_SEC/(float)time_req_1 << "  |  " << CLOCKS_PER_SEC/(float)time_req_2 << std::endl;
+         std::cout << row[0] << "  |  " << (float)time_req_1*1000/CLOCKS_PER_SEC << "  |  " << (float)time_req_2*1000/CLOCKS_PER_SEC << "  |  " << CLOCKS_PER_SEC/(float)time_req_1 << "  |  " << CLOCKS_PER_SEC/(float)time_req_2 << std::endl;
+        
         // Read output buffers
         // TODO(user): Insert getting data out code.
+        
         ave_inference_ms += time_req_1;
         ave_invoke_ms += time_req_2;
 
