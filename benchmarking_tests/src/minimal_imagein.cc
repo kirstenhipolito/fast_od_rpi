@@ -59,66 +59,81 @@ void fill_buffer_with_mat(cv::Mat input, float* to_inp, int height, int width,in
 }
 
 int main(int argc, char* argv[]) {
-  if (argc != 2) {
-    fprintf(stderr, "minimal <tflite model>\n");
-    return 1;
-  }
-  
-  const char* filename = argv[1];
+    if (argc != 2) {
+        fprintf(stderr, "minimal <tflite model>\n");
+        return 1;
+    }
 
-  cv::Mat image;
-  cv::Mat resized;
-  int image_height = 300;
-  int image_width = 300;
-  int image_channels = 3;
+    int num_runs = 50;
+    clock_t ave_invoke_ms = 0;
+    clock_t ave_inference_ms = 0;
+    
+    const char* filename = argv[1];
 
-  clock_t time_req, time_req_1;
-  string img_path = "../datasets/VOCdevkit_test/VOC2007/JPEGImages/000043.jpg";
+    cv::Mat image;
+    cv::Mat resized;
+    int image_height = 300;
+    int image_width = 300;
+    int image_channels = 3;
 
-  std::cout << std::fixed;
-  std::cout << std::setprecision(6);
-  
-  time_req_1 = clock();
+    clock_t time_req_1, time_req_2;
+    string img_path = "../datasets/VOCdevkit_test/VOC2007/JPEGImages/000043.jpg";
 
-  // Load model
-  std::unique_ptr<tflite::FlatBufferModel> model =
-      tflite::FlatBufferModel::BuildFromFile(filename);
-  TFLITE_MINIMAL_CHECK(model != nullptr);
+    std::cout << std::fixed;
+    std::cout << std::setprecision(6);
+    
+    
 
-  // Build the interpreter
-  tflite::ops::builtin::BuiltinOpResolver resolver;
-  InterpreterBuilder builder(*model, resolver);
-  std::unique_ptr<Interpreter> interpreter;
-  builder(&interpreter);
-  TFLITE_MINIMAL_CHECK(interpreter != nullptr);
+    // Load model
+    std::unique_ptr<tflite::FlatBufferModel> model =
+        tflite::FlatBufferModel::BuildFromFile(filename);
+    TFLITE_MINIMAL_CHECK(model != nullptr);
 
-  // Allocate tensor buffers.
-  TFLITE_MINIMAL_CHECK(interpreter->AllocateTensors() == kTfLiteOk);
-  // printf("=== Pre-invoke Interpreter State ===\n");
-  // tflite::PrintInterpreterState(interpreter.get());
-  /*
-  // Fill input buffers, resize image and load into input  
-  image = cv::imread(img_path, cv::IMREAD_COLOR);
-  if (image.empty()) {
-      std::cout << "Could not read the image: " << img_path << std::endl;
-  } 
-  cv::resize(image, resized, cv::Size(image_width,image_height));
-  fill_buffer_with_mat(resized,interpreter->typed_input_tensor<float>(0),image_height,image_width,image_channels);
-  */
-  // Fill input buffers
-  // TODO(user): Insert code to fill input tensors
-  time_req = clock();
-  // Run inference
-  TFLITE_MINIMAL_CHECK(interpreter->Invoke() == kTfLiteOk);
-  float* output = interpreter->typed_output_tensor<float>(0);
-  time_req = clock() - time_req;
-  time_req_1 = clock() - time_req_1;
-  // printf("\n\n=== Post-invoke Interpreter State ===\n");
-  // tflite::PrintInterpreterState(interpreter.get());
-  std::cout << "Time of invoke (s/FPS):" << (float)time_req/CLOCKS_PER_SEC << " / " << CLOCKS_PER_SEC/(float)time_req << std::endl;
-  std::cout << "Total time (s/FPS): " << (float)time_req_1/CLOCKS_PER_SEC << " / " << CLOCKS_PER_SEC/(float)time_req_1 << std::endl;
-  // Read output buffers
-  // TODO(user): Insert getting data out code.
+    // Build the interpreter
+    tflite::ops::builtin::BuiltinOpResolver resolver;
+    InterpreterBuilder builder(*model, resolver);
+    std::unique_ptr<Interpreter> interpreter;
+    builder(&interpreter);
+    TFLITE_MINIMAL_CHECK(interpreter != nullptr);
 
-  return 0;
+    // Allocate tensor buffers.
+    TFLITE_MINIMAL_CHECK(interpreter->AllocateTensors() == kTfLiteOk);
+
+    for (int i = 0; i < num_runs; i++) {
+
+        time_req_1 = clock(); //time_req_1 -> ave_inference_ms
+
+        // Fill input buffers, resize image and load into input  
+        image = cv::imread(img_path, cv::IMREAD_COLOR);
+        if (image.empty()) {
+            std::cout << "Could not read the image: " << img_path << std::endl;
+        } 
+        cv::resize(image, resized, cv::Size(image_width,image_height));
+        // memcpy(interpreter->typed_input_tensor<float>(0), image.data, image.total() * image.elemSize());
+        fill_buffer_with_mat(resized,interpreter->typed_input_tensor<float>(0),image_height,image_width,image_channels);
+        
+        time_req_2 = clock(); //time_req_1 -> ave_invoke_ms
+
+        // Run inference
+        TFLITE_MINIMAL_CHECK(interpreter->Invoke() == kTfLiteOk);
+        float* output = interpreter->typed_output_tensor<float>(0);
+
+        time_req_1 = clock() - time_req_1;
+        time_req_2 = clock() - time_req_2;
+
+        std::cout << row[0] << "  |  " << (float)time_req_1*1000/CLOCKS_PER_SEC << "  |  " << (float)time_req_2*1000/CLOCKS_PER_SEC << "  |  " << CLOCKS_PER_SEC/(float)time_req_1 << "  |  " << CLOCKS_PER_SEC/(float)time_req_2 << std::endl;
+        
+        // Read output buffers
+        // TODO(user): Insert getting data out code.
+        
+        ave_inference_ms += time_req_1;
+        ave_invoke_ms += time_req_2;
+
+
+    }
+
+    std::cout << "Average invoke time (ms): " << (float)ave_invoke_ms*1000/(CLOCKS_PER_SEC*num_runs) << std::endl;
+    std::cout << "Average inference time (ms): " << (float)ave_inference_ms*1000/(CLOCKS_PER_SEC*num_runs) << std::endl;
+    
+    return 0;
 }

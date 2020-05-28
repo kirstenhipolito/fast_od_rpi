@@ -46,44 +46,45 @@ using namespace tflite;
   }
 
 int main(int argc, char* argv[]) {
-  if (argc != 2) {
-    fprintf(stderr, "minimal <tflite model>\n");
-    return 1;
-  }
-  const char* filename = argv[1];
-  clock_t time_req_1;
-  // Load model
-  std::unique_ptr<tflite::FlatBufferModel> model =
-      tflite::FlatBufferModel::BuildFromFile(filename);
-  TFLITE_MINIMAL_CHECK(model != nullptr);
+    if (argc != 2) {
+        fprintf(stderr, "minimal <tflite model>\n");
+        return 1;
+    }
 
-  // Build the interpreter
-  tflite::ops::builtin::BuiltinOpResolver resolver;
-  InterpreterBuilder builder(*model, resolver);
-  std::unique_ptr<Interpreter> interpreter;
-  builder(&interpreter);
-  TFLITE_MINIMAL_CHECK(interpreter != nullptr);
+    int num_runs = 50;
+    clock_t ave_invoke_ms = 0;
 
-  // Allocate tensor buffers.
-  TFLITE_MINIMAL_CHECK(interpreter->AllocateTensors() == kTfLiteOk);
-  // printf("=== Pre-invoke Interpreter State ===\n");
-  // tflite::PrintInterpreterState(interpreter.get());
+    const char* filename = argv[1];
+    clock_t time_req_1;
+    // Load model
+    std::unique_ptr<tflite::FlatBufferModel> model =
+        tflite::FlatBufferModel::BuildFromFile(filename);
+    TFLITE_MINIMAL_CHECK(model != nullptr);
 
-  // Fill input buffers
-  // TODO(user): Insert code to fill input tensors
-  
-  time_req_1 = clock();
-  // Run inference
-  TFLITE_MINIMAL_CHECK(interpreter->Invoke() == kTfLiteOk);
-  time_req_1 = clock() - time_req_1;
+    // Build the interpreter
+    tflite::ops::builtin::BuiltinOpResolver resolver;
+    InterpreterBuilder builder(*model, resolver);
+    std::unique_ptr<Interpreter> interpreter;
+    builder(&interpreter);
+    TFLITE_MINIMAL_CHECK(interpreter != nullptr);
 
-  std::cout << "Time of invoke (s/FPS): " << (float)time_req_1/CLOCKS_PER_SEC << " / " << CLOCKS_PER_SEC/(float)time_req_1 << std::endl;
+    // Allocate tensor buffers.
+    TFLITE_MINIMAL_CHECK(interpreter->AllocateTensors() == kTfLiteOk);
 
-  // printf("\n\n=== Post-invoke Interpreter State ===\n");
-  // tflite::PrintInterpreterState(interpreter.get());
+    for (int i = 0; i < num_runs; i++) {
+    
+        time_req_1 = clock();
+        // Run inference
+        TFLITE_MINIMAL_CHECK(interpreter->Invoke() == kTfLiteOk);
+        time_req_1 = clock() - time_req_1;
 
-  // Read output buffers
-  // TODO(user): Insert getting data out code.
+        std::cout << "Time of invoke (s/FPS): " << (float)time_req_1/CLOCKS_PER_SEC << " / " << CLOCKS_PER_SEC/(float)time_req_1 << std::endl;
+    }
 
-  return 0;
+    ave_invoke_ms += time_req_1;
+
+    std::cout << "Average invoke time (ms): " << (float)ave_invoke_ms*1000/(CLOCKS_PER_SEC*num_runs) << std::endl;
+
+
+    return 0;
 }
