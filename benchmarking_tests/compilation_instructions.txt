@@ -40,6 +40,10 @@ g++ -O3 -DNDEBUG -fPIC --std=c++11 -DTFLITE_WITH_RUY -DTFLITE_WITHOUT_XNNPACK -I
 	-o fast_od_rpi/benchmarking_tests/bin/minimal_noinput fast_od_rpi/benchmarking_tests/obj/minimal_noinput.o \
 	 tensorflow/tensorflow/lite/tools/make/gen/osx_x86_64/lib/libtensorflow-lite.a  -lstdc++ -lpthread -lm -lz -ldl
 
+g++ -O3 -DNDEBUG -fPIC --std=c++11 -DTFLITE_WITH_RUY -DTFLITE_WITHOUT_XNNPACK -I. -Itensorflow -Itensorflow/tensorflow/lite/tools/make/downloads/ -Itensorflow/tensorflow/lite/tools/make/downloads/eigen -Itensorflow/tensorflow/lite/tools/make/downloads/absl -Itensorflow/tensorflow/lite/tools/make/downloads/gemmlowp -Itensorflow/tensorflow/lite/tools/make/downloads/ruy -Itensorflow/tensorflow/lite/tools/make/downloads/neon_2_sse -Itensorflow/tensorflow/lite/tools/make/downloads/farmhash/src -Itensorflow/tensorflow/lite/tools/make/downloads/flatbuffers/include -Itensorflow/tensorflow/lite/tools/make/downloads/fp16/include -I -I/usr/local/include \
+	-o fast_od_rpi/benchmarking_tests/bin/minimal_noinput_larq fast_od_rpi/benchmarking_tests/obj/minimal_noinput.o \
+	 compute-engine/third_party/tensorflow/tensorflow/lite/tools/make/gen/osx_x86_64/lib/libtensorflow-lite.a  -lstdc++ -lpthread -lm -lz -ldl
+
 MINIMAL_IMAGEIN:
 g++ -O3 -DNDEBUG -fPIC --std=c++11 -DTFLITE_WITH_RUY -DTFLITE_WITHOUT_XNNPACK  -Itensorflow -Itensorflow/tensorflow/lite/tools/make/downloads/ -Itensorflow/tensorflow/lite/tools/make/downloads/eigen -Itensorflow/tensorflow/lite/tools/make/downloads/absl -Itensorflow/tensorflow/lite/tools/make/downloads/gemmlowp -Itensorflow/tensorflow/lite/tools/make/downloads/ruy -Itensorflow/tensorflow/lite/tools/make/downloads/neon_2_sse -Itensorflow/tensorflow/lite/tools/make/downloads/farmhash/src -Itensorflow/tensorflow/lite/tools/make/downloads/flatbuffers/include -Itensorflow/tensorflow/lite/tools/make/downloads/fp16/include -I -I/usr/local/include -c fast_od_rpi/benchmarking_tests/src/minimal_imagein.cc -o fast_od_rpi/benchmarking_tests/obj/minimal_imagein.o `pkg-config --cflags --libs opencv`
 
