@@ -1,4 +1,4 @@
-import tensorflow as tf
+import tflite_runtime.interpreter as tflite
 import numpy as np
 import time
 import sys
@@ -6,7 +6,7 @@ import sys
 from timeit import default_timer as timer
 
 # Load TFLite model and allocate tensors.
-interpreter = tf.lite.Interpreter(model_path=sys.argv[1])
+interpreter = tflite.Interpreter(model_path=sys.argv[1])
 interpreter.allocate_tensors()
 
 # Get input and output tensors.
