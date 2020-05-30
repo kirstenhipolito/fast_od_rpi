@@ -79,9 +79,12 @@ int main(int argc, char* argv[]) {
         time_req_1 = clock() - time_req_1;
 
         std::cout << "Time of invoke (s/FPS): " << (float)time_req_1/CLOCKS_PER_SEC << " / " << CLOCKS_PER_SEC/(float)time_req_1 << std::endl;
+
+        ave_invoke_ms += time_req_1;
+        
     }
 
-    ave_invoke_ms += time_req_1;
+    
 
     std::cout << "Average invoke time (ms): " << (float)ave_invoke_ms*1000/(CLOCKS_PER_SEC*num_runs) << std::endl;
 
