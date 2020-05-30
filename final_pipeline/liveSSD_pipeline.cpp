@@ -17,6 +17,25 @@ using namespace tflite;
     exit(1);                                                 \
   }
 
+
+//USE IF INPUT VECTOR TAKES UNSIGNED CHAR DATATYPE
+void fill_buffer_with_mat_2(cv::Mat input, uint8_t* to_inp, int height, int width,int channels)
+{
+    //UNOPTIMIZED
+    //To do: Find a memcpy version of this
+    for(int i = 0; i < height; i++){
+      int des_pos;
+      for(int j = 0; j < width; j++){
+        des_pos = (i * width + j) * channels;
+        cv::Vec3b intensity = input.at<cv::Vec3b>(i, j);
+        to_inp[des_pos] = (uint8_t) intensity.val[2]; //R
+        to_inp[des_pos+1] = (uint8_t) intensity.val[1]; //G
+        to_inp[des_pos+2] = (uint8_t) intensity.val[0]; //B
+      }
+    }
+}
+
+//USE IF INPUT VECTOR TAKES FLOAT DATATYPE
 void fill_buffer_with_mat(cv::Mat input, float* to_inp, int height, int width,int channels)
 {
   //UNOPTIMIZED
