@@ -1,4 +1,4 @@
-import tensorflow as tf
+import tflite_runtime.interpreter as tflite
 import numpy as np
 import time
 import sys
@@ -6,7 +6,7 @@ import sys
 from timeit import default_timer as timer
 
 # Load TFLite model and allocate tensors.
-interpreter = tf.lite.Interpreter(model_path=sys.argv[1])
+interpreter = tflite.Interpreter(model_path=sys.argv[1])
 interpreter.allocate_tensors()
 
 # Get input and output tensors.
@@ -27,7 +27,7 @@ tflite_results = interpreter.get_tensor(output_details[0]['index'])
 
 # In[6]:
 
-
+"""
 from imageio import imread
 from tensorflow.keras.preprocessing import image
 
@@ -49,10 +49,10 @@ input_images = np.array(input_images)
 
 # In[8]:
 
-runs = 25
-
 #Inference
 interpreter.set_tensor(input_details[0]['index'], input_images)
+"""
+runs = 25
 
 start = timer()
 
