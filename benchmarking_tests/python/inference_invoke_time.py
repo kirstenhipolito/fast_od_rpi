@@ -27,7 +27,7 @@ tflite_results = interpreter.get_tensor(output_details[0]['index'])
 
 # In[6]:
 
-
+"""
 from imageio import imread
 from tensorflow.keras.preprocessing import image
 
@@ -49,10 +49,10 @@ input_images = np.array(input_images)
 
 # In[8]:
 
-runs = 25
-
 #Inference
 interpreter.set_tensor(input_details[0]['index'], input_images)
+"""
+runs = 25
 
 start = timer()
 
