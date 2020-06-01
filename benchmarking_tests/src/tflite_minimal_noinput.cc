@@ -65,7 +65,7 @@ int main(int argc, char* argv[]) {
     tflite::ops::builtin::BuiltinOpResolver resolver;
     InterpreterBuilder builder(*model, resolver);
     std::unique_ptr<Interpreter> interpreter;
-    builder(&interpreter);
+    tflite::InterpreterBuilder(*model, resolver)(&interpreter,num_threads);
     TFLITE_MINIMAL_CHECK(interpreter != nullptr);
 
     // Allocate tensor buffers.
@@ -74,7 +74,7 @@ int main(int argc, char* argv[]) {
     // Initial invoke()
     TFLITE_MINIMAL_CHECK(interpreter->Invoke() == kTfLiteOk);
 
-    std::cout << "Testing invoke() on " << argv[2] << "threads for " << num_runs << "times." << std::endl;
+    std::cout << "Testing invoke() on " << argv[2] << " threads for " << num_runs << " times." << std::endl;
 
     // Run multiple iterations of invoke
     for (int i = 0; i < num_runs; i++) {
