@@ -1,6 +1,6 @@
 # Faster Object Detection on Raspberry Pi
 
-This project performs faster object detection on the Raspberry Pi 4 B through the use of binarized models built with Larq. The submodules included within are: \n
+This project performs faster object detection on the Raspberry Pi 4 B through the use of binarized models built with Larq. The submodules included within are:
 
 - `benchmarking_tests`: Benchmarking tests to measure the inference speed of TFLite models.
 - `models_trained`: TFLite files (.tflite files) of various models. Some are binarized models.
