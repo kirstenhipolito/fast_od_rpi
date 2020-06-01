@@ -71,6 +71,9 @@ int main(int argc, char* argv[]) {
     // Allocate tensor buffers.
     TFLITE_MINIMAL_CHECK(interpreter->AllocateTensors() == kTfLiteOk);
 
+    // Initial invoke()
+    TFLITE_MINIMAL_CHECK(interpreter->Invoke() == kTfLiteOk);
+
     for (int i = 0; i < num_runs; i++) {
     
         time_req_1 = clock();

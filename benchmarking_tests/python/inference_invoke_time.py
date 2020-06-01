@@ -18,7 +18,7 @@ input_shape = input_details[0]['shape']
 input_data = np.array(np.random.random_sample(input_shape), dtype=np.float32)
 
 #Inference
-interpreter.set_tensor(input_details[0]['index'], input_data)
+# interpreter.set_tensor(input_details[0]['index'], input_data)
 interpreter.invoke()
 
 #0=cls, 1=reg, 2=base_layers
@@ -46,22 +46,21 @@ img = image.img_to_array(img)
 input_images.append(img)
 input_images = np.array(input_images)
 
-
 # In[8]:
 
 #Inference
 interpreter.set_tensor(input_details[0]['index'], input_images)
 """
-runs = 25
-
-start = timer()
+runs = 50
+ave = 0
 
 for i in range(runs):
+    start = timer()
     interpreter.invoke()
+    end = timer() 
+    ave = ave + (end - start)
 
-end = timer() 
-
-ave_latency = ((end - start)/runs)*1000
+ave_latency = (ave/runs)*1000
 ave_FPS = 1000/ave_latency
 print('Average detection latency is ', ave_latency, 'ms.')
 print('Average FPS is ', ave_FPS)
