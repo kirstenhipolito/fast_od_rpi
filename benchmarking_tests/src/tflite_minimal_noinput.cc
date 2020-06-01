@@ -40,22 +40,22 @@ limitations under the License.
 using namespace tflite;
 
 #define TFLITE_MINIMAL_CHECK(x)                              \
-  if (!(x)) {                                                \
-    fprintf(stderr, "Error at %s:%d\n", __FILE__, __LINE__); \
-    exit(1);                                                 \
-  }
+    if (!(x)) {                                                \
+        fprintf(stderr, "Error at %s:%d\n", __FILE__, __LINE__); \
+        exit(1);                                                 \
+    }
 
 int main(int argc, char* argv[]) {
-    if (argc != 2) {
-        fprintf(stderr, "minimal <tflite model>\n");
+    if (argc != 3) {
+        fprintf(stderr, "lce_minimal <tflite model> <num_threads>\n");
         return 1;
     }
 
     int num_runs = 50;
-    clock_t ave_invoke_ms = 0;
+    float ave_invoke_ms = 0;
+    int num_threads = std::atoi(argv[2]);
 
     const char* filename = argv[1];
-    clock_t time_req_1;
     // Load model
     std::unique_ptr<tflite::FlatBufferModel> model =
         tflite::FlatBufferModel::BuildFromFile(filename);
@@ -74,23 +74,20 @@ int main(int argc, char* argv[]) {
     // Initial invoke()
     TFLITE_MINIMAL_CHECK(interpreter->Invoke() == kTfLiteOk);
 
+    std::cout << "Testing invoke() on " << argv[2] << "threads for " << num_runs << "times." << std::endl;
+
+    // Run multiple iterations of invoke
     for (int i = 0; i < num_runs; i++) {
-    
-        time_req_1 = clock();
+        auto start = std::chrono::steady_clock::now();
         // Run inference
         TFLITE_MINIMAL_CHECK(interpreter->Invoke() == kTfLiteOk);
-        time_req_1 = clock() - time_req_1;
+        auto end = std::chrono::steady_clock::now();
 
-        std::cout << "Time of invoke (s/FPS): " << (float)time_req_1/CLOCKS_PER_SEC << " / " << CLOCKS_PER_SEC/(float)time_req_1 << std::endl;
-
-        ave_invoke_ms += time_req_1;
-        
+        std::cout << "Time of invoke (ms): " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+        ave_invoke_ms += std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+        // ave_invoke_ms += time_req_1;
     }
 
-    
-
-    std::cout << "Average invoke time (ms): " << (float)ave_invoke_ms*1000/(CLOCKS_PER_SEC*num_runs) << std::endl;
-
-
+    std::cout << "Average invoke time (ms): " << (float)ave_invoke_ms/num_runs << std::endl;
     return 0;
 }
