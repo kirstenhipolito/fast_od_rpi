@@ -14,7 +14,8 @@ A set of tests lifted from the TFLite and LARQ libraries to benchmark the perfor
 - To run "mininal_imagein" binaries:
 
     `./benchmarking_tests/bin/[framework]_minimal_imagein [tflite_file] [num_threads]`
-    
+
 ## Compilation
 If you are using this on a Raspberry Pi 4 with Manjaro 20.02, there is no need to compile. You can directly use the binaries in /bin.
-\n See compilation_instructions.txt for instructions on compilation.
+
+See compilation_instructions.txt for instructions on compilation.
