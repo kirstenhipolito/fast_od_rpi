@@ -1,15 +1,16 @@
 #include <ctime>
 #include <iostream>
 #include <cstdio>
-#include <raspicam/raspicam_cv.h>
-#include <opencv2/imgproc.hpp>
-#include <opencv2/core/matx.hpp>
-#include "tensorflow/lite/interpreter.h"
-#include "tensorflow/lite/kernels/register.h"
-#include "tensorflow/lite/model.h"
-#include "tensorflow/lite/optional_debug_tools.h"
+//#include <raspicam/raspicam_cv.h>
+//#include <opencv2/imgproc.hpp>
+//#include <opencv2/core/matx.hpp>
+#include "opencv2/opencv.hpp"
+//#include "tensorflow/lite/interpreter.h"
+//#include "tensorflow/lite/kernels/register.h"
+//#include "tensorflow/lite/model.h"
+//#include "tensorflow/lite/optional_debug_tools.h"
 
-using namespace tflite;
+//using namespace tflite;
 
 #define TFLITE_MINIMAL_CHECK(x)                              \
   if (!(x)) {                                                \
@@ -55,20 +56,29 @@ void fill_buffer_with_mat(cv::Mat input, float* to_inp, int height, int width,in
 int main (int argc, char **argv)
 {
   //Usage if in the Build Folder: liveSSD_pipeline ../<model name>.tflite
+  /*
   if (argc != 2) {
     fprintf(stderr, "liveSSD_pipeline <tflite model relative path>\n");
     return 1;
-  }
+  }*/
 
   const char* filename = argv[1];
   time_t timer_begin,timer_end;
-	raspicam::RaspiCam_Cv Camera;
+	//raspicam::RaspiCam_Cv Camera;
 	cv::Mat image;
   cv::Mat resized;
   int height = 300;
   int width = 300;
   int channels = 3;
 
+  cv::VideoCapture Camera(0); //capture the video from webcam
+
+  if ( !Camera.isOpened() )  // if not success, exit program
+  {
+       std::cout << "Cannot open the web cam" << std::endl;
+       return -1;
+  }
+  /*
   // Load model
   std::unique_ptr<tflite::FlatBufferModel> model = tflite::FlatBufferModel::BuildFromFile(filename);
   TFLITE_MINIMAL_CHECK(model != nullptr);
@@ -106,31 +116,32 @@ int main (int argc, char **argv)
 	if (!Camera.open()) {
     std::cerr<<"Error opening the camera"<< "\n";
     return -1;
-  }
+  }*/
 
   std::cout << "Starting display..."<< "\n";
-  std::cout << "Press ESC to begin bounding box prediction." << "\n";
+  std::cout << "Press any key begin bounding box prediction." << "\n";
 
   cv::namedWindow("Camera View", cv::WINDOW_AUTOSIZE);
 
   //Test video-stream
   while(1){
-    Camera.grab();
-		Camera.retrieve(image);
+    //Camera.grab();
+		//Camera.retrieve(image);
+    Camera >> image;
     cv::resize(image, resized, cv::Size(width,height));
 		cv::imshow("Camera View",resized);
-    char c = cv::waitKey(1);
-    if(c == 27) break;
+    if(cv::waitKey(30) >= 0) break;
 
   }
   std::cout << "Press ESC to end." << "\n";
 
   //Proper pipeline
   while(1){
-    Camera.grab();
-    Camera.retrieve(image);
+    //Camera.grab();
+    //Camera.retrieve(image);
+    Camera >> image;
     cv::resize(image, resized, cv::Size(width,height));
-
+    /*
     //Fill model input buffers with captured Mat frames
     fill_buffer_with_mat(resized,to_inp,height,width,channels);
 
@@ -143,7 +154,7 @@ int main (int argc, char **argv)
 
     //To do: Grab output predictions and feed to NMS
     //To do: Use NMS to cut down number of bounding boxes
-    //To do: Draw bounding boxes on resized
+    //To do: Draw bounding boxes on resized*/
 
     cv::imshow("Camera View",resized);
 
@@ -151,6 +162,7 @@ int main (int argc, char **argv)
     if(c == 27) break;
   }
 
-  Camera.release();
+  //Camera.release();
+  return 0;
 
 }
