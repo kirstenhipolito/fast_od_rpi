@@ -1,5 +1,5 @@
 #include <cstdio>
-#include <ctime>
+#include <chrono>
 #include <iostream>
 #include <iomanip>
 #include <cmath>
