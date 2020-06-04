@@ -1,7 +1,7 @@
 file(REMOVE_RECURSE
   "CMakeFiles/liveSSD_pipeline.dir/liveSSD_pipeline.cpp.o"
-  "liveSSD_pipeline.pdb"
   "liveSSD_pipeline"
+  "liveSSD_pipeline.pdb"
 )
 
 # Per-language clean rules from dependency scanning.
