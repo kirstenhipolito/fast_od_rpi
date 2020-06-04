@@ -1,23 +1,23 @@
 #include <ctime>
 #include <iostream>
 #include <cstdio>
-//#include <raspicam/raspicam_cv.h>
+/*#include <raspicam/raspicam_cv.h>
 //#include <opencv2/imgproc.hpp>
-//#include <opencv2/core/matx.hpp>
+//#include <opencv2/core/matx.hpp>*/
 #include "opencv2/opencv.hpp"
-//#include "tensorflow/lite/interpreter.h"
-//#include "tensorflow/lite/kernels/register.h"
-//#include "tensorflow/lite/model.h"
-//#include "tensorflow/lite/optional_debug_tools.h"
+/*#include "tensorflow/lite/interpreter.h"
+#include "tensorflow/lite/kernels/register.h"
+#include "tensorflow/lite/model.h"
+#include "tensorflow/lite/optional_debug_tools.h"
 
-//using namespace tflite;
+using namespace tflite;
 
 #define TFLITE_MINIMAL_CHECK(x)                              \
   if (!(x)) {                                                \
     fprintf(stderr, "Error at %s:%d\n", __FILE__, __LINE__); \
     exit(1);                                                 \
   }
-
+*/
 
 //USE IF INPUT VECTOR TAKES UNSIGNED CHAR DATATYPE
 void fill_buffer_with_mat_2(cv::Mat input, uint8_t* to_inp, int height, int width,int channels)

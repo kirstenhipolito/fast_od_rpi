@@ -8,10 +8,11 @@ project (final_pipeline)
 find_package(PkgConfig REQUIRED)
 find_package(OpenCV REQUIRED)
 
-
 #IF  ( OpenCV_FOUND AND raspicam_CV_FOUND)
+
 IF  (OpenCV_FOUND)
 pkg_check_modules(OPENCV4 REQUIRED IMPORTED_TARGET opencv4)
+
 #change to the path of your RaspberryPi TFLite C++ static library
 #set(RPI_TFLITE_LIBPATH "/home/pi/Documents/EEE190/tensorflow/tensorflow/lite/tools/make/gen/rpi_armv7l/lib/libtensorflow-lite.a")
 
@@ -22,6 +23,7 @@ pkg_check_modules(OPENCV4 REQUIRED IMPORTED_TARGET opencv4)
 MESSAGE(STATUS "COMPILING PIPELINE")
 
 add_executable(liveSSD_pipeline liveSSD_pipeline.cpp)
+
 #add_executable (liveSSD_pipeline liveSSD_pipeline.cpp ${TFLITE_INCLUDEPATH_2}/tensorflow/lite/interpreter.h ${TFLITE_INCLUDEPATH_2}/tensorflow/lite/kernels/register.h ${TFLITE_INCLUDEPATH_2}/tensorflow/lite/model.h ${TFLITE_INCLUDEPATH_2}/tensorflow/lite/optional_debug_tools.h)
 #target_include_directories(liveSSD_pipeline PUBLIC ${TFLITE_INCLUDEPATH_1} ${TFLITE_INCLUDEPATH_2})
 
@@ -30,8 +32,10 @@ add_executable(liveSSD_pipeline liveSSD_pipeline.cpp)
 
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -pthread")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ggdb ${OPENCV4_CFLAGS}")
+
 #target_link_libraries (liveSSD_pipeline ${raspicam_CV_LIBS} ${RPI_TFLITE_LIBPATH})
 target_link_libraries (liveSSD_pipeline PkgConfig::OPENCV4)
+
 ELSE()
 MESSAGE(FATAL_ERROR "OPENCV NOT FOUND IN YOUR SYSTEM")
 ENDIF()
