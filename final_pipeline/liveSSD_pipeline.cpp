@@ -5,7 +5,7 @@
 //#include <opencv2/imgproc.hpp>
 //#include <opencv2/core/matx.hpp>*/
 #include "opencv2/opencv.hpp"
-/*#include "tensorflow/lite/interpreter.h"
+#include "tensorflow/lite/interpreter.h"
 #include "tensorflow/lite/kernels/register.h"
 #include "tensorflow/lite/model.h"
 #include "tensorflow/lite/optional_debug_tools.h"
@@ -17,7 +17,7 @@ using namespace tflite;
     fprintf(stderr, "Error at %s:%d\n", __FILE__, __LINE__); \
     exit(1);                                                 \
   }
-*/
+
 
 //USE IF INPUT VECTOR TAKES UNSIGNED CHAR DATATYPE
 void fill_buffer_with_mat_2(cv::Mat input, uint8_t* to_inp, int height, int width,int channels)
@@ -56,11 +56,11 @@ void fill_buffer_with_mat(cv::Mat input, float* to_inp, int height, int width,in
 int main (int argc, char **argv)
 {
   //Usage if in the Build Folder: liveSSD_pipeline ../<model name>.tflite
-  /*
+
   if (argc != 2) {
     fprintf(stderr, "liveSSD_pipeline <tflite model relative path>\n");
     return 1;
-  }*/
+  }
 
   const char* filename = argv[1];
   time_t timer_begin,timer_end;
@@ -78,7 +78,7 @@ int main (int argc, char **argv)
        std::cout << "Cannot open the web cam" << std::endl;
        return -1;
   }
-  /*
+
   // Load model
   std::unique_ptr<tflite::FlatBufferModel> model = tflite::FlatBufferModel::BuildFromFile(filename);
   TFLITE_MINIMAL_CHECK(model != nullptr);
@@ -110,7 +110,7 @@ int main (int argc, char **argv)
 
 
   //camera currently set to capture frames of BGR color matrix format
-  Camera.set( cv::CAP_PROP_FORMAT, CV_8UC3 );
+  /*Camera.set( cv::CAP_PROP_FORMAT, CV_8UC3 );
 
   std::cout<< "\nOpening Camera..." << "\n";
 	if (!Camera.open()) {
@@ -141,7 +141,7 @@ int main (int argc, char **argv)
     //Camera.retrieve(image);
     Camera >> image;
     cv::resize(image, resized, cv::Size(width,height));
-    /*
+
     //Fill model input buffers with captured Mat frames
     fill_buffer_with_mat(resized,to_inp,height,width,channels);
 
@@ -154,7 +154,7 @@ int main (int argc, char **argv)
 
     //To do: Grab output predictions and feed to NMS
     //To do: Use NMS to cut down number of bounding boxes
-    //To do: Draw bounding boxes on resized*/
+    //To do: Draw bounding boxes on resized
 
     cv::imshow("Camera View",resized);
 
