@@ -203,7 +203,7 @@ int main(int argc, char* argv[]) {
     }
 
     std::cout << "Average invoke time (ms/FPS): " << (float)ave_invoke_ms/num_runs << " / " << num_runs/((float)ave_invoke_ms/1000) << std::endl;
-    std::cout << "Average inference time (ms/FPS): " << (float)ave_inference_ms/num_runs << " / " << num_runs/((float)ave_invoke_ms/1000) << std::endl;
+    std::cout << "Average inference time (ms/FPS): " << (float)ave_inference_ms/num_runs << " / " << num_runs/((float)ave_inference_ms/1000) << std::endl;
 
     return 0;
 }
