@@ -150,6 +150,8 @@ int main(int argc, char* argv[]) {
         file >> row;
         img_path = img_directory + row[0];
 
+        std::cout << "image: " << row[0] << std::endl;
+
         auto start_inference = std::chrono::steady_clock::now();
 
         // Fill input buffers, resize image and load into input  
