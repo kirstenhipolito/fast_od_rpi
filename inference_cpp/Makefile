@@ -66,3 +66,7 @@ clean:
 	rm -rf obj
 	mkdir bin
 	mkdir obj
+
+rm-out:
+	rm -rf out
+	mkdir out

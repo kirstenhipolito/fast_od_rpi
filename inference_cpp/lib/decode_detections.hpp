@@ -21,6 +21,8 @@ MatrixXf decode_detections(const MatrixXf & y_pred, const float & confidence_thr
 
 void draw_bounding_boxes(cv::Mat input, const Ref<const MatrixXf>& boxes);
 
+void draw_bounding_boxes_save(cv::Mat input, const Ref<const MatrixXf>& boxes, string img_path)
+
 MatrixXf convert_coordinates(const MatrixXf & matrix);
 
 MatrixXf vectorized_nms(const MatrixXf & boxes, const float & iou_thresh);

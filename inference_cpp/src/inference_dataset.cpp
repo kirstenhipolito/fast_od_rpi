@@ -109,7 +109,7 @@ int main(int argc, char* argv[]) {
     cv::Mat resized;
     Eigen::MatrixXf y_pred(y_pred_rows, y_pred_cols);
     Eigen::MatrixXf vec_boxes;
-    
+
     int image_height = 300;
     int image_width = 300;
     int image_channels = 3;
@@ -186,9 +186,8 @@ int main(int argc, char* argv[]) {
         }
 
         vec_boxes = decode_detections((Eigen::MatrixXf) y_pred, confidence_thresh, iou_thresh, top_k, image_height, image_width);
-        draw_bounding_boxes(resized,vec_boxes);
-
-        cv::imwrite("out/"+row[0], resized);
+        std::cout << vec_boxes << std::endl;
+        draw_bounding_boxes_save(resized,vec_boxes, "out/"+row[0]);
 
         auto end_inference = std::chrono::steady_clock::now();
 
