@@ -115,7 +115,7 @@ int main(int argc, char* argv[]) {
     int top_k = 4;
     
     string img_directory = "../../datasets/VOCdevkit_test/VOC2007/JPEGImages/";
-    string img_csv = "../../ssd-keras/dataset_voc_csv/2007_person_test.csv";
+    string img_csv = "../../datasets/2007_person_test.csv";
     // string img_path = "../../datasets/VOCdevkit_test/VOC2007/JPEGImages/000043.jpg";
     string img_path = "";
 
