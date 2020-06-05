@@ -113,7 +113,7 @@ int main(int argc, char* argv[]) {
     int image_height = 300;
     int image_width = 300;
     int image_channels = 3;
-    float confidence_thresh = 0.3;
+    float confidence_thresh = 0.001;
     float iou_thresh = 0.45;
     int top_k = 4;
     
@@ -146,6 +146,8 @@ int main(int argc, char* argv[]) {
 
     // Allocate tensor buffers.
     TFLITE_MINIMAL_CHECK(interpreter->AllocateTensors() == kTfLiteOk);
+
+    // std::cout << interpreter->get_output_details() << std::endl;
 
     std::cout << std::fixed;
     std::cout << std::setprecision(6);
@@ -184,7 +186,9 @@ int main(int argc, char* argv[]) {
                 y_pred(i,j) = output[des_pos];
             }
         }
-
+	
+	// std::cout << "out_size: " << interpreter->outputs().size() << std::endl;
+	
         vec_boxes = decode_detections((Eigen::MatrixXf) y_pred, confidence_thresh, iou_thresh, top_k, image_height, image_width);
         std::cout << vec_boxes << std::endl;
         draw_bounding_boxes_save(resized,vec_boxes, "out/"+row[0]);
