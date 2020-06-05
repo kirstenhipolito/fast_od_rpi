@@ -63,9 +63,11 @@ int main(int argc, char* argv[]) {
     float ave_inference_ms = 0;
     int num_threads = 4;
 
+    const int y_pred_rows = 2006;
+  	const int y_pred_cols = 33;
     cv::Mat image;
     cv::Mat resized;
-    Eigen::MatrixXf y_pred;
+    Eigen::MatrixXf y_pred(y_pred_rows, y_pred_cols);
     Eigen::MatrixXf vec_boxes;
 
     int image_height = 300;
@@ -115,7 +117,7 @@ int main(int argc, char* argv[]) {
         // Load image into input
         Camera >> image;
         cv::resize(image, resized, cv::Size(image_width,image_height));
-        
+
         fill_buffer_with_mat(resized,interpreter->typed_input_tensor<float>(0),image_height,image_width,image_channels);
 
         auto start_invoke = std::chrono::steady_clock::now();
@@ -126,13 +128,20 @@ int main(int argc, char* argv[]) {
         auto end_invoke = std::chrono::steady_clock::now();
 
         // Get output, decode, and draw bounding boxes
-        // output = interpreter->tensor(interpreter->outputs()[0]);
-        // int output_idx = interpreter->outputs()[0];
-        // float* output = interpreter->typed_tensor<float>(output_idx);
-		// auto y_pred = output->data.f;
+         output = interpreter->tensor(interpreter->outputs()[0]);
+         int output_idx = interpreter->outputs()[0];
+         float* output = interpreter->typed_tensor<float>(output_idx);
 
-        // vec_boxes = decode_detections((Eigen::MatrixXf) y_pred, confidence_thresh, iou_thresh, top_k, image_height, image_width);
-        // draw_bounding_boxes(resized,vec_boxes);
+         for(int i = 0; i < y_pred_rows; i++){
+           int des_pos;
+           for (int j = 0; j < y_pred_cols; j++){
+              des_pos = (i * y_pred_cols + j);
+              y_pred(i,j) = output[des_pos];
+           }
+         }
+
+         vec_boxes = decode_detections((Eigen::MatrixXf) y_pred, confidence_thresh, iou_thresh, top_k, image_height, image_width);
+         draw_bounding_boxes(resized,vec_boxes);
 
         auto end_inference = std::chrono::steady_clock::now();
 
