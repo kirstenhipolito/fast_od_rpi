@@ -18,7 +18,7 @@
 
 #include <Eigen/Dense>
 
-// #include "larq_compute_engine/tflite/kernels/lce_ops_register.h"
+#include "larq_compute_engine/tflite/kernels/lce_ops_register.h"
 #include "tensorflow/lite/interpreter.h"
 #include "tensorflow/lite/kernels/register.h"
 #include "tensorflow/lite/model.h"
@@ -91,14 +91,12 @@ int main(int argc, char* argv[]) {
     tflite::ops::builtin::BuiltinOpResolver resolver;
 
     // register LCE custom ops
-    // compute_engine::tflite::RegisterLCECustomOps(&resolver);
+    compute_engine::tflite::RegisterLCECustomOps(&resolver);
 
     // Build the interpreter
     std::unique_ptr<Interpreter> interpreter;
     tflite::InterpreterBuilder(*model, resolver)(&interpreter,num_threads);
     TFLITE_MINIMAL_CHECK(interpreter != nullptr);
-
-    interpreter->SetNumThreads(4);
 
     // Fill 'input'.
     float* to_inp = interpreter->typed_input_tensor<float>(0);

@@ -9,7 +9,7 @@
 #include <sstream>
 #include <vector>
 
-#include "third_party/fast_od_rpi/inference_cpp/lib/decode_detections.hpp"
+#include "decode_detections.hpp"
 
 #include <opencv2/imgproc.hpp>
 #include <opencv2/core/matx.hpp>
@@ -103,8 +103,6 @@ int main(int argc, char* argv[]) {
     float ave_inference_ms = 0;
     int num_threads = 4;
 
-    
-
     cv::Mat image;
     cv::Mat resized;
     int image_height = 300;
@@ -136,8 +134,6 @@ int main(int argc, char* argv[]) {
     std::unique_ptr<Interpreter> interpreter;
     tflite::InterpreterBuilder(*model, resolver)(&interpreter,num_threads);
     TFLITE_MINIMAL_CHECK(interpreter != nullptr);
-
-    interpreter->SetNumThreads(4);
 
     // Fill 'input'.
     float* to_inp = interpreter->typed_input_tensor<float>(0);
