@@ -110,7 +110,7 @@ int main(int argc, char* argv[]) {
     int image_height = 300;
     int image_width = 300;
     int image_channels = 3;
-    float confidence_thresh = 0.3
+    float confidence_thresh = 0.3;
     float iou_thresh = 0.45;
     int top_k = 4;
     
