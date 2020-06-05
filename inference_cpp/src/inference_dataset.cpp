@@ -8,13 +8,15 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+
+#include "decode_detections.hpp"
+
 #include <opencv2/imgproc.hpp>
 #include <opencv2/core/matx.hpp>
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
 
-#include "decode_detections.hpp"
 #include "larq_compute_engine/tflite/kernels/lce_ops_register.h"
 #include "tensorflow/lite/interpreter.h"
 #include "tensorflow/lite/kernels/register.h"
