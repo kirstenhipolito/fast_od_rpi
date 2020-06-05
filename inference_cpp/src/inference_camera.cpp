@@ -15,6 +15,9 @@
 #include <opencv2/highgui.hpp>
 
 #include "decode_detections.hpp"
+
+#include <Eigen/Dense>
+
 // #include "larq_compute_engine/tflite/kernels/lce_ops_register.h"
 #include "tensorflow/lite/interpreter.h"
 #include "tensorflow/lite/kernels/register.h"
@@ -62,6 +65,9 @@ int main(int argc, char* argv[]) {
 
     cv::Mat image;
     cv::Mat resized;
+    Eigen::MatrixXf y_pred;
+    Eigen::MatrixXf vec_boxes;
+
     int image_height = 300;
     int image_width = 300;
     int image_channels = 3;
@@ -93,15 +99,13 @@ int main(int argc, char* argv[]) {
     TFLITE_MINIMAL_CHECK(interpreter != nullptr);
 
     interpreter->SetNumThreads(4);
-    // interpreter->SetAllowFp16PrecisionForFp32(true);
 
     // Fill 'input'.
     float* to_inp = interpreter->typed_input_tensor<float>(0);
+    TfLiteTensor* output = nullptr;
 
     // Allocate tensor buffers.
     TFLITE_MINIMAL_CHECK(interpreter->AllocateTensors() == kTfLiteOk);
-    // printf("=== Pre-invoke Interpreter State ===\n");
-    // tflite::PrintInterpreterState(interpreter.get());
 
     std::cout << "Press any key to end." << "\n";
     std::cout << std::fixed;
@@ -110,31 +114,40 @@ int main(int argc, char* argv[]) {
 
     while(1)
     {
-        auto start1 = std::chrono::steady_clock::now();
-
+        auto start_inference = std::chrono::steady_clock::now();
+        // Load image into input
         Camera >> image;
         cv::resize(image, resized, cv::Size(image_width,image_height));
         
         fill_buffer_with_mat(resized,interpreter->typed_input_tensor<float>(0),image_height,image_width,image_channels);
 
-        auto start2 = std::chrono::steady_clock::now();
+        auto start_invoke = std::chrono::steady_clock::now();
 
         // Run inference
         TFLITE_MINIMAL_CHECK(interpreter->Invoke() == kTfLiteOk);
         float* output = interpreter->typed_output_tensor<float>(0);
 
-      // Get end clock
-        auto end = std::chrono::steady_clock::now();
+        auto end_invoke = std::chrono::steady_clock::now();
+
+        // Get output, decode, and draw bounding boxes
+        output = interpreter->tensor(interpreter->outputs()[0]);
+		auto y_pred = output->data.f;
+
+        vec_boxes = decode_detections((Eigen::MatrixXf) y_pred, confidence_thresh, iou_thresh, top_k, image_height, image_width);
+        draw_bounding_boxes(resized,vec_boxes);
+
+        auto end_inference = std::chrono::steady_clock::now();
+
         cv::imshow("Camera View",resized);
-        std::cout << "Time of invoke (ms): " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start2).count() << std::endl;
-        std::cout << "Time of inference (ms): " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start1).count() << std::endl;
-        ave_invoke_ms += std::chrono::duration_cast<std::chrono::milliseconds>(end - start2).count();
-        ave_inference_ms += std::chrono::duration_cast<std::chrono::milliseconds>(end - start1).count();
+        std::cout << "Time of invoke (ms): " << std::chrono::duration_cast<std::chrono::milliseconds>(end_invoke - start_invoke).count() << std::endl;
+        std::cout << "Time of inference (ms): " << std::chrono::duration_cast<std::chrono::milliseconds>(end_inference - start_inference).count() << std::endl;
+        ave_invoke_ms += std::chrono::duration_cast<std::chrono::milliseconds>(end_invoke - start_invoke).count();
+        ave_inference_ms += std::chrono::duration_cast<std::chrono::milliseconds>(end_inference - start_inference).count();
 
       if(cv::waitKey(30) >= 0) break;
     }
 
-   std::cout << "Average invoke time (ms): " << (float)ave_invoke_ms/num_runs << std::endl;
+    std::cout << "Average invoke time (ms): " << (float)ave_invoke_ms/num_runs << std::endl;
     std::cout << "Average inference time (ms): " << (float)ave_inference_ms/num_runs << std::endl;
     return 0;
 }

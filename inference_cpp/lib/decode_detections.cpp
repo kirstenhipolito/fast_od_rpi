@@ -102,6 +102,41 @@ MatrixXf decode_detections(const MatrixXf & y_pred, const float & confidence_thr
 	return y_pred_decoded;
 }
 
+void draw_bounding_boxes(cv::Mat input, const Ref<const MatrixXf>& boxes){
+  //classificaions of the PASCAL VOC 2012 Dataset 
+  string classNames[21] = {"background","aeroplane", "bicycle", "bird",
+          "boat","bottle", "bus", "car", "cat",
+           "chair", "cow", "diningtable", "dog",
+           "horse", "motorbike", "person", "pottedplant",
+           "sheep", "sofa", "train", "tvmonitor"};
+
+  //get number of bounding boxes
+  int num_boxes = boxes.rows();
+
+  //draw all boxes and classifications on image (all red boxes/text for now)
+  for (int i = 0; i < num_boxes; i++)
+  {
+    //pixels above top left corner of box on the y-axis
+    int confPointOffset = 3;
+    int classPointOffset = 16;
+
+    //scale of text size compared to default
+    double textScale = 0.35;
+
+    int classIndex = (int) boxes(i,0);
+    string confidenceValue = to_string(boxes(i,1));
+
+    cv::Point topleft = cv::Point(boxes(i,2),boxes(i,3));
+    cv::Point bottomright = cv::Point(boxes(i,4),boxes(i,5));
+    cv::Point confPoint = cv::Point(boxes(i,2),boxes(i,3) - confPointOffset);
+    cv::Point classPoint = cv::Point(boxes(i,2),boxes(i,3) - classPointOffset);
+
+    cv::rectangle(input, topleft, bottomright, cv::Scalar(0,0,255));
+    cv::putText(input,classNames[classIndex],classPoint,cv::FONT_HERSHEY_SIMPLEX,textScale,cv::Scalar(0,0,255));
+    cv::putText(input,confidenceValue,confPoint,cv::FONT_HERSHEY_SIMPLEX,textScale,cv::Scalar(0,0,255));
+  }
+}
+
 MatrixXf convert_coordinates(const MatrixXf & matrix){
 	MatrixXf converted = matrix;
 	int start_index = matrix.cols();

@@ -138,15 +138,12 @@ int main(int argc, char* argv[]) {
     TFLITE_MINIMAL_CHECK(interpreter != nullptr);
 
     interpreter->SetNumThreads(4);
-    // interpreter->SetAllowFp16PrecisionForFp32(true);
 
     // Fill 'input'.
     float* to_inp = interpreter->typed_input_tensor<float>(0);
 
     // Allocate tensor buffers.
     TFLITE_MINIMAL_CHECK(interpreter->AllocateTensors() == kTfLiteOk);
-    // printf("=== Pre-invoke Interpreter State ===\n");
-    // tflite::PrintInterpreterState(interpreter.get());
 
     file >> row;
 
