@@ -146,8 +146,8 @@ int main(int argc, char* argv[]) {
       if(cv::waitKey(30) >= 0) break;
     }
 
-    std::cout << "Average invoke time (ms/FPS): " << (float)ave_invoke_ms/num_runs << " / " << num_runs/((float)ave_invoke_ms*1000) << std::endl;
-    std::cout << "Average inference time (ms/FPS): " << (float)ave_inference_ms/num_runs << " / " << num_runs/((float)ave_invoke_ms*1000) << std::endl;
-    
+    std::cout << "Average invoke time (ms/FPS): " << (float)ave_invoke_ms/num_runs << " / " << num_runs/((float)ave_invoke_ms/1000) << std::endl;
+    std::cout << "Average inference time (ms/FPS): " << (float)ave_inference_ms/num_runs << " / " << num_runs/((float)ave_invoke_ms/1000) << std::endl;
+
     return 0;
 }

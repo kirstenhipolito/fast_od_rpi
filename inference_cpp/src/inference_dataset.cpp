@@ -119,7 +119,6 @@ int main(int argc, char* argv[]) {
 
     std::ifstream file(img_csv);
     CSVRow row;
-
     file >> row;
 
     // Load model
@@ -149,8 +148,6 @@ int main(int argc, char* argv[]) {
     for (int i = 0; i < num_runs; i++) {
         file >> row;
         img_path = img_directory + row[0];
-
-        std::cout << "image: " << row[0] << std::endl;
 
         auto start_inference = std::chrono::steady_clock::now();
 
@@ -182,8 +179,8 @@ int main(int argc, char* argv[]) {
 
     }
 
-    std::cout << "Average invoke time (ms/FPS): " << (float)ave_invoke_ms/num_runs << " / " << num_runs/((float)ave_invoke_ms*1000) << std::endl;
-    std::cout << "Average inference time (ms/FPS): " << (float)ave_inference_ms/num_runs << " / " << num_runs/((float)ave_invoke_ms*1000) << std::endl;
+    std::cout << "Average invoke time (ms/FPS): " << (float)ave_invoke_ms/num_runs << " / " << num_runs/((float)ave_invoke_ms/1000) << std::endl;
+    std::cout << "Average inference time (ms/FPS): " << (float)ave_inference_ms/num_runs << " / " << num_runs/((float)ave_invoke_ms/1000) << std::endl;
 
     return 0;
 }
