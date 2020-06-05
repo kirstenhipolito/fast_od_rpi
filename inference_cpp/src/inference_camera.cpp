@@ -124,16 +124,17 @@ int main(int argc, char* argv[]) {
 
         // Run inference
         TFLITE_MINIMAL_CHECK(interpreter->Invoke() == kTfLiteOk);
-        float* output = interpreter->typed_output_tensor<float>(0);
 
         auto end_invoke = std::chrono::steady_clock::now();
 
         // Get output, decode, and draw bounding boxes
         // output = interpreter->tensor(interpreter->outputs()[0]);
-		auto y_pred = output->data.f;
+        // int output_idx = interpreter->outputs()[0];
+        // float* output = interpreter->typed_tensor<float>(output_idx);
+		// auto y_pred = output->data.f;
 
-        vec_boxes = decode_detections((Eigen::MatrixXf) y_pred, confidence_thresh, iou_thresh, top_k, image_height, image_width);
-        draw_bounding_boxes(resized,vec_boxes);
+        // vec_boxes = decode_detections((Eigen::MatrixXf) y_pred, confidence_thresh, iou_thresh, top_k, image_height, image_width);
+        // draw_bounding_boxes(resized,vec_boxes);
 
         auto end_inference = std::chrono::steady_clock::now();
 
