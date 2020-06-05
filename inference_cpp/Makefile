@@ -37,7 +37,7 @@ inference_camera:
 
 decode_detections:
 	aarch64-linux-gnu-g++ -O3 -DNDEBUG -fPIC -DTFLITE_WITH_RUY --std=c++11 -march=armv8-a -funsafe-math-optimizations -ftree-vectorize -fPIC \
-	-I../../tensorflow/tensorflow/lite/tools/make/downloads/eigen -c lib/decode_detections.cpp -o obj/decode_detections.o
+	-I../../tensorflow/tensorflow/lite/tools/make/downloads/eigen -c lib/decode_detections.cpp -o obj/decode_detections.o `pkg-config --cflags --libs opencv4`
 
 clean:
 	rm -rf bin

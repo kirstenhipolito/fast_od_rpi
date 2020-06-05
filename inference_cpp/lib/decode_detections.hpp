@@ -3,11 +3,10 @@
 
 #include <vector>
 #include <Eigen/Dense>
-// #include <opencv2/opencv.hpp>
+#include <opencv2/opencv.hpp>
 #include <iostream>
-// #include <chrono> 
-// #include <fstream>
-// #include <numeric>
+#include <string>
+#include <fstream>
 
 
 using namespace Eigen;
