@@ -145,6 +145,7 @@ int main(int argc, char* argv[]) {
     std::cout << "Press any key to end." << "\n";
     std::cout << std::fixed;
     std::cout << std::setprecision(6);
+    cv::namedWindow("Camera View", cv::WINDOW_AUTOSIZE);
 
     while(1)
     {
@@ -163,7 +164,7 @@ int main(int argc, char* argv[]) {
 
       // Get end clock
         auto end = std::chrono::steady_clock::now();
-
+        cv::imshow("Camera View",resized);
         std::cout << "Time of invoke (ms): " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start2).count() << std::endl;
         std::cout << "Time of inference (ms): " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start1).count() << std::endl;
         ave_invoke_ms += std::chrono::duration_cast<std::chrono::milliseconds>(end - start2).count();
