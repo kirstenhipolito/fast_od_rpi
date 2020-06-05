@@ -102,7 +102,6 @@ int main(int argc, char* argv[]) {
 
     // Fill 'input'.
     float* to_inp = interpreter->typed_input_tensor<float>(0);
-    TfLiteTensor* output = nullptr;
 
     // Allocate tensor buffers.
     TFLITE_MINIMAL_CHECK(interpreter->AllocateTensors() == kTfLiteOk);
@@ -130,7 +129,7 @@ int main(int argc, char* argv[]) {
         auto end_invoke = std::chrono::steady_clock::now();
 
         // Get output, decode, and draw bounding boxes
-        output = interpreter->tensor(interpreter->outputs()[0]);
+        // output = interpreter->tensor(interpreter->outputs()[0]);
 		auto y_pred = output->data.f;
 
         vec_boxes = decode_detections((Eigen::MatrixXf) y_pred, confidence_thresh, iou_thresh, top_k, image_height, image_width);
