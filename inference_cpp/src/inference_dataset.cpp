@@ -103,8 +103,13 @@ int main(int argc, char* argv[]) {
     float ave_inference_ms = 0;
     int num_threads = 4;
 
+    const int y_pred_rows = 2006;
+  	const int y_pred_cols = 33;
     cv::Mat image;
     cv::Mat resized;
+    Eigen::MatrixXf y_pred(y_pred_rows, y_pred_cols);
+    Eigen::MatrixXf vec_boxes;
+    
     int image_height = 300;
     int image_width = 300;
     int image_channels = 3;
