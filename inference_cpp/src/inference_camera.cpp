@@ -137,8 +137,8 @@ int main(int argc, char* argv[]) {
         auto end_inference = std::chrono::steady_clock::now();
 
         cv::imshow("Camera View",resized);
-        std::cout << "Time of invoke (ms): " << std::chrono::duration_cast<std::chrono::milliseconds>(end_invoke - start_invoke).count() << std::endl;
-        std::cout << "Time of inference (ms): " << std::chrono::duration_cast<std::chrono::milliseconds>(end_inference - start_inference).count() << std::endl;
+        std::cout << "Time of invoke (ms/FPS): " << std::chrono::duration_cast<std::chrono::milliseconds>(end_invoke - start_invoke).count() << std::endl;
+        std::cout << "Time of inference (ms/FPS): " << std::chrono::duration_cast<std::chrono::milliseconds>(end_inference - start_inference).count() << std::endl;
         ave_invoke_ms += std::chrono::duration_cast<std::chrono::milliseconds>(end_invoke - start_invoke).count();
         ave_inference_ms += std::chrono::duration_cast<std::chrono::milliseconds>(end_inference - start_inference).count();
         num_runs += 1;
@@ -146,7 +146,7 @@ int main(int argc, char* argv[]) {
       if(cv::waitKey(30) >= 0) break;
     }
 
-    std::cout << "Average invoke time (ms): " << (float)ave_invoke_ms/num_runs << std::endl;
-    std::cout << "Average inference time (ms): " << (float)ave_inference_ms/num_runs << std::endl;
+    std::cout << "Average invoke time (ms/FPS): " << (float)ave_invoke_ms/num_runs << num_runs/((float)ave_invoke_ms*1000) << std::endl;
+    std::cout << "Average inference time (ms/FPS): " << (float)ave_inference_ms/num_runs << num_runs/((float)ave_invoke_ms*1000) << std::endl;
     return 0;
 }

@@ -150,7 +150,7 @@ int main(int argc, char* argv[]) {
         file >> row;
         img_path = img_directory + row[0];
 
-        auto start1 = std::chrono::steady_clock::now();
+        auto start_inference = std::chrono::steady_clock::now();
 
         // Fill input buffers, resize image and load into input  
         image = cv::imread(img_path, cv::IMREAD_COLOR);
@@ -161,24 +161,27 @@ int main(int argc, char* argv[]) {
         // memcpy(interpreter->typed_input_tensor<float>(0), image.data, image.total() * image.elemSize());
         fill_buffer_with_mat(resized,interpreter->typed_input_tensor<float>(0),image_height,image_width,image_channels);
         
-        auto start2 = std::chrono::steady_clock::now();
+        auto start_invoke = std::chrono::steady_clock::now();
 
         // Run inference
         TFLITE_MINIMAL_CHECK(interpreter->Invoke() == kTfLiteOk);
+        
+        // Get end clock
+        auto end_invoke = std::chrono::steady_clock::now();
+
         float* output = interpreter->typed_output_tensor<float>(0);
 
-        // Get end clock
-        auto end = std::chrono::steady_clock::now();
+        auto end_inference = std::chrono::steady_clock::now();
 
-        std::cout << "Time of invoke (ms): " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start2).count() << std::endl;
-        std::cout << "Time of inference (ms): " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start1).count() << std::endl;
+        std::cout << "Time of invoke (ms/FPS): " << std::chrono::duration_cast<std::chrono::milliseconds>(end_invoke - start_invoke).count() << " / " << 1/(std::chrono::duration_cast<std::chrono::seconds>(end_invoke - start_invoke).count()) << std::endl;
+        std::cout << "Time of inference (ms/FPS): " << std::chrono::duration_cast<std::chrono::milliseconds>(end_inference - start_inference).count() << " / " << 1/(std::chrono::duration_cast<std::chrono::seconds>(end_inference - start_inference).count()) << std::endl;
         ave_invoke_ms += std::chrono::duration_cast<std::chrono::milliseconds>(end - start2).count();
         ave_inference_ms += std::chrono::duration_cast<std::chrono::milliseconds>(end - start1).count();
 
     }
 
-    std::cout << "Average invoke time (ms): " << (float)ave_invoke_ms/num_runs << std::endl;
-    std::cout << "Average inference time (ms): " << (float)ave_inference_ms/num_runs << std::endl;
+    std::cout << "Average invoke time (ms/FPS): " << (float)ave_invoke_ms/num_runs << " / " << num_runs/((float)ave_invoke_ms*1000) << std::endl;
+    std::cout << "Average inference time (ms/FPS): " << (float)ave_inference_ms/num_runs << " / " << num_runs/((float)ave_invoke_ms*1000) << std::endl;
 
     return 0;
 }
