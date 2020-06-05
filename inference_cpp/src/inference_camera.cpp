@@ -47,53 +47,12 @@ void fill_buffer_with_mat(cv::Mat input, float* to_inp, int height, int width,in
   }
 }
 
-class CSVRow
-{
-    public:
-        std::string const& operator[](std::size_t index) const
-        {
-            return m_data[index];
-        }
-        std::size_t size() const
-        {
-            return m_data.size();
-        }
-        void readNextRow(std::istream& str)
-        {
-            std::string         line;
-            std::getline(str, line);
-
-            std::stringstream   lineStream(line);
-            std::string         cell;
-
-            m_data.clear();
-            while(std::getline(lineStream, cell, ','))
-            {
-                m_data.push_back(cell);
-            }
-            // This checks for a trailing comma with no data after it.
-            if (!lineStream && cell.empty())
-            {
-                // If there was a trailing comma then add an empty element.
-                m_data.push_back("");
-            }
-        }
-    private:
-        std::vector<std::string>    m_data;
-};
-
-std::istream& operator>>(std::istream& str, CSVRow& data)
-{
-    data.readNextRow(str);
-    return str;
-}
-
 int main(int argc, char* argv[]) {
     if (argc != 2) {
         fprintf(stderr, "./bin/inference_trial <tflite model>\n");
         return 1;
     }
-    // const char* filename = "../../models_trained/ssd_mobilenet_tflite.tflite";
+
     char* filename = argv[1];
 
     int num_runs = 50;
@@ -106,7 +65,9 @@ int main(int argc, char* argv[]) {
     int image_height = 300;
     int image_width = 300;
     int image_channels = 3;
-    clock_t time_req_1, time_req_2;
+    float confidence_thresh = 0.3
+    float iou_thresh = 0.45;
+    int top_k = 4;
 
     cv::VideoCapture Camera(0); //capture the video from rpi camera
 

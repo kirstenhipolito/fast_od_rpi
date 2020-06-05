@@ -9,7 +9,7 @@
 #include <sstream>
 #include <vector>
 
-#include "decode_detections.hpp"
+#include "third_party/fast_od_rpi/inference_cpp/lib/decode_detections.hpp"
 
 #include <opencv2/imgproc.hpp>
 #include <opencv2/core/matx.hpp>
@@ -95,7 +95,7 @@ int main(int argc, char* argv[]) {
         fprintf(stderr, "./bin/inference_trial <tflite model>\n");
         return 1;
     }
-    // const char* filename = "../../models_trained/ssd_mobilenet_tflite.tflite";
+
     char* filename = argv[1];
 
     int num_runs = 50;
@@ -103,14 +103,17 @@ int main(int argc, char* argv[]) {
     float ave_inference_ms = 0;
     int num_threads = 4;
 
+    
+
     cv::Mat image;
     cv::Mat resized;
     int image_height = 300;
     int image_width = 300;
     int image_channels = 3;
-    clock_t time_req_1, time_req_2;
+    float confidence_thresh = 0.3
+    float iou_thresh = 0.45;
+    int top_k = 4;
     
-
     string img_directory = "../../datasets/VOCdevkit_test/VOC2007/JPEGImages/";
     string img_csv = "../../ssd-keras/dataset_voc_csv/2007_person_test.csv";
     // string img_path = "../../datasets/VOCdevkit_test/VOC2007/JPEGImages/000043.jpg";
