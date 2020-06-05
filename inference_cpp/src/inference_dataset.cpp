@@ -120,6 +120,8 @@ int main(int argc, char* argv[]) {
     std::ifstream file(img_csv);
     CSVRow row;
 
+    file >> row;
+
     // Load model
     std::unique_ptr<tflite::FlatBufferModel> model = tflite::FlatBufferModel::BuildFromFile(filename);
     TFLITE_MINIMAL_CHECK(model != nullptr);
@@ -140,8 +142,6 @@ int main(int argc, char* argv[]) {
 
     // Allocate tensor buffers.
     TFLITE_MINIMAL_CHECK(interpreter->AllocateTensors() == kTfLiteOk);
-
-    file >> row;
 
     std::cout << std::fixed;
     std::cout << std::setprecision(6);
@@ -175,8 +175,8 @@ int main(int argc, char* argv[]) {
 
         std::cout << "Time of invoke (ms/FPS): " << std::chrono::duration_cast<std::chrono::milliseconds>(end_invoke - start_invoke).count() << " / " << 1/(std::chrono::duration_cast<std::chrono::seconds>(end_invoke - start_invoke).count()) << std::endl;
         std::cout << "Time of inference (ms/FPS): " << std::chrono::duration_cast<std::chrono::milliseconds>(end_inference - start_inference).count() << " / " << 1/(std::chrono::duration_cast<std::chrono::seconds>(end_inference - start_inference).count()) << std::endl;
-        ave_invoke_ms += std::chrono::duration_cast<std::chrono::milliseconds>(end - start2).count();
-        ave_inference_ms += std::chrono::duration_cast<std::chrono::milliseconds>(end - start1).count();
+        ave_invoke_ms += std::chrono::duration_cast<std::chrono::milliseconds>(end_invoke - start_invoke).count();
+        ave_inference_ms += std::chrono::duration_cast<std::chrono::milliseconds>(end_inference - start_inference).count();
 
     }
 
