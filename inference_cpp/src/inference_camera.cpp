@@ -128,7 +128,7 @@ int main(int argc, char* argv[]) {
         auto end_invoke = std::chrono::steady_clock::now();
 
         // Get output, decode, and draw bounding boxes
-         output = interpreter->tensor(interpreter->outputs()[0]);
+        // output = interpreter->tensor(interpreter->outputs()[0]);
          int output_idx = interpreter->outputs()[0];
          float* output = interpreter->typed_tensor<float>(output_idx);
 
