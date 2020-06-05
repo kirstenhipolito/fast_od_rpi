@@ -168,7 +168,22 @@ int main(int argc, char* argv[]) {
         // Get end clock
         auto end_invoke = std::chrono::steady_clock::now();
 
-        float* output = interpreter->typed_output_tensor<float>(0);
+        // Get output, decode, and draw bounding boxes
+        int output_idx = interpreter->outputs()[0];
+        float* output = interpreter->typed_tensor<float>(output_idx);
+
+        for(int i = 0; i < y_pred_rows; i++){
+            int des_pos;
+            for (int j = 0; j < y_pred_cols; j++){
+                des_pos = (i * y_pred_cols + j);
+                y_pred(i,j) = output[des_pos];
+            }
+        }
+
+        vec_boxes = decode_detections((Eigen::MatrixXf) y_pred, confidence_thresh, iou_thresh, top_k, image_height, image_width);
+        draw_bounding_boxes(resized,vec_boxes);
+
+        cv::imwrite("out/"+row[0], resized);
 
         auto end_inference = std::chrono::steady_clock::now();
 
