@@ -58,7 +58,7 @@ int main(int argc, char* argv[]) {
 
     char* filename = argv[1];
 
-    int num_runs = 50;
+    int num_runs = 0;
     float ave_invoke_ms = 0;
     float ave_inference_ms = 0;
     int num_threads = 4;
@@ -141,6 +141,7 @@ int main(int argc, char* argv[]) {
         std::cout << "Time of inference (ms): " << std::chrono::duration_cast<std::chrono::milliseconds>(end_inference - start_inference).count() << std::endl;
         ave_invoke_ms += std::chrono::duration_cast<std::chrono::milliseconds>(end_invoke - start_invoke).count();
         ave_inference_ms += std::chrono::duration_cast<std::chrono::milliseconds>(end_inference - start_inference).count();
+        num_runs += 1;
 
       if(cv::waitKey(30) >= 0) break;
     }
