@@ -15,7 +15,7 @@
 #include <opencv2/highgui.hpp>
 
 #include "decode_detections.hpp"
-#include "larq_compute_engine/tflite/kernels/lce_ops_register.h"
+// #include "larq_compute_engine/tflite/kernels/lce_ops_register.h"
 #include "tensorflow/lite/interpreter.h"
 #include "tensorflow/lite/kernels/register.h"
 #include "tensorflow/lite/model.h"
@@ -97,8 +97,9 @@ int main(int argc, char* argv[]) {
     char* filename = argv[1];
 
     int num_runs = 50;
-    clock_t ave_invoke_ms = 0;
-    clock_t ave_inference_ms = 0;
+    float ave_invoke_ms = 0;
+    float ave_inference_ms = 0;
+    int num_threads = 4;
 
     cv::Mat image;
     cv::Mat resized;
@@ -123,12 +124,11 @@ int main(int argc, char* argv[]) {
     tflite::ops::builtin::BuiltinOpResolver resolver;
 
     // register LCE custom ops
-    compute_engine::tflite::RegisterLCECustomOps(&resolver);
+    // compute_engine::tflite::RegisterLCECustomOps(&resolver);
 
     // Build the interpreter
-    tflite::InterpreterBuilder builder(*model, resolver);
     std::unique_ptr<Interpreter> interpreter;
-    builder(&interpreter);
+    tflite::InterpreterBuilder(*model, resolver)(&interpreter,num_threads);
     TFLITE_MINIMAL_CHECK(interpreter != nullptr);
 
     interpreter->SetNumThreads(4);
@@ -143,41 +143,37 @@ int main(int argc, char* argv[]) {
     // tflite::PrintInterpreterState(interpreter.get());
 
     std::cout << "Press any key to end." << "\n";
-    std::cout << "   Image    | im+inf(ms) |  inf(ms)   | im+inf(fps)|  inf(fps) " << std::endl;
     std::cout << std::fixed;
     std::cout << std::setprecision(6);
+    cv::namedWindow("Camera View", cv::WINDOW_AUTOSIZE);
 
     while(1)
     {
-      time_req_1 = clock(); //time_req_1 -> ave_inference_ms
+        auto start1 = std::chrono::steady_clock::now();
 
-      Camera >> image;
-      cv::resize(image, resized, cv::Size(image_width,image_height));
-      
-      fill_buffer_with_mat(resized,interpreter->typed_input_tensor<float>(0),image_height,image_width,image_channels);
+        Camera >> image;
+        cv::resize(image, resized, cv::Size(image_width,image_height));
+        
+        fill_buffer_with_mat(resized,interpreter->typed_input_tensor<float>(0),image_height,image_width,image_channels);
 
-      time_req_2 = clock(); //time_req_1 -> ave_invoke_ms
+        auto start2 = std::chrono::steady_clock::now();
 
-      // Run inference
-      TFLITE_MINIMAL_CHECK(interpreter->Invoke() == kTfLiteOk);
-      float* output = interpreter->typed_output_tensor<float>(0);
+        // Run inference
+        TFLITE_MINIMAL_CHECK(interpreter->Invoke() == kTfLiteOk);
+        float* output = interpreter->typed_output_tensor<float>(0);
 
-      time_req_1 = clock() - time_req_1;
-      time_req_2 = clock() - time_req_2;
-
-      std::cout << row[0] << "  |  " << (float)time_req_1*1000/CLOCKS_PER_SEC << "  |  " << (float)time_req_2*1000/CLOCKS_PER_SEC << "  |  " << CLOCKS_PER_SEC/(float)time_req_1 << "  |  " << CLOCKS_PER_SEC/(float)time_req_2 << std::endl;
-
-      // Read output buffers
-      // TODO(user): Insert getting data out code.
-
-      ave_inference_ms += time_req_1;
-      ave_invoke_ms += time_req_2;
+      // Get end clock
+        auto end = std::chrono::steady_clock::now();
+        cv::imshow("Camera View",resized);
+        std::cout << "Time of invoke (ms): " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start2).count() << std::endl;
+        std::cout << "Time of inference (ms): " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start1).count() << std::endl;
+        ave_invoke_ms += std::chrono::duration_cast<std::chrono::milliseconds>(end - start2).count();
+        ave_inference_ms += std::chrono::duration_cast<std::chrono::milliseconds>(end - start1).count();
 
       if(cv::waitKey(30) >= 0) break;
     }
 
-    std::cout << "Average invoke time (ms): " << (float)ave_invoke_ms*1000/(CLOCKS_PER_SEC*num_runs) << std::endl;
-    std::cout << "Average inference time (ms): " << (float)ave_inference_ms*1000/(CLOCKS_PER_SEC*num_runs) << std::endl;
-
+   std::cout << "Average invoke time (ms): " << (float)ave_invoke_ms/num_runs << std::endl;
+    std::cout << "Average inference time (ms): " << (float)ave_inference_ms/num_runs << std::endl;
     return 0;
 }

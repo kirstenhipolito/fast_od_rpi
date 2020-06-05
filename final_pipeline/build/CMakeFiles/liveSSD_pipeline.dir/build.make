@@ -99,6 +99,7 @@ liveSSD_pipeline_EXTERNAL_OBJECTS =
 
 liveSSD_pipeline: CMakeFiles/liveSSD_pipeline.dir/liveSSD_pipeline.cpp.o
 liveSSD_pipeline: CMakeFiles/liveSSD_pipeline.dir/build.make
+liveSSD_pipeline: /home/pi/Documents/EEE190/tensorflow/tensorflow/lite/tools/make/gen/linux_aarch64/lib/libtensorflow-lite.a
 liveSSD_pipeline: /usr/lib/libopencv_gapi.so
 liveSSD_pipeline: /usr/lib/libopencv_stitching.so
 liveSSD_pipeline: /usr/lib/libopencv_alphamat.so
