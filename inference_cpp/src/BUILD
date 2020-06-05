@@ -5,17 +5,9 @@ package(
     licenses = ["notice"],  # Apache 2.0
 )
 
-cc_library(
-    name = "decode_detections",
-    srcs = ["lib/decode_detections.cpp"],
-    hdrs = ["lib/decode_detections.hpp"],
-    copts = ["-O3","-fPIC","-DNDEBUG"],
-    deps = ["@eigen"],
-)
-
 cc_binary(
     name = "inference_dataset",
-    srcs = ["src/inference_dataset.cpp"],
+    srcs = ["inference_dataset.cpp"],
     linkopts = tflite_linkopts() + select({
         "@org_tensorflow//tensorflow:android": [
             "-pie",  # Android 5.0 and later supports only PIE
@@ -27,9 +19,8 @@ cc_binary(
         "//larq_compute_engine/tflite/kernels:lce_op_kernels",
         "@org_tensorflow//tensorflow/lite:framework",
         "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
-	":decode_detections",
+        "@opencv//:opencv",
+        "//third_party/fast_od_rpi/inference_cpp/lib:decode_detections",
     ],
     copts = ["-O3","-fPIC","-DNDEBUG"],
 )
-
-
