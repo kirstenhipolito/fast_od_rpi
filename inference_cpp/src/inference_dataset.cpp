@@ -270,6 +270,7 @@ int main(int argc, char* argv[]) {
         std::cout << "Vec boxes: \n" << vec_boxes << std::endl;
         std::cout << "Time of invoke (ms/FPS): " << (float) std::chrono::duration_cast<std::chrono::milliseconds>(end_invoke - start_invoke).count() << " / " << 1000/(float)(std::chrono::duration_cast<std::chrono::milliseconds>(end_invoke - start_invoke).count()) << std::endl;
         std::cout << "Time of inference (ms/FPS): " << (float) std::chrono::duration_cast<std::chrono::milliseconds>(end_inference - start_inference).count() << " / " << 1000/(float)(std::chrono::duration_cast<std::chrono::milliseconds>(end_inference - start_inference).count()) << std::endl;
+        std::cout << std::endl;
         ave_invoke_ms += (float) std::chrono::duration_cast<std::chrono::milliseconds>(end_invoke - start_invoke).count();
         ave_inference_ms += (float) std::chrono::duration_cast<std::chrono::milliseconds>(end_inference - start_inference).count();
 
