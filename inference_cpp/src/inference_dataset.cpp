@@ -144,7 +144,7 @@ int main(int argc, char* argv[]) {
         file >> row;
 
         while (file >> row) {
-            img_path_vec.push_back(img_directory + row[0];);
+            img_path_vec.push_back(img_directory + row[0]);
         }
 
         // num_runs = img_path_vec.size();
@@ -169,7 +169,9 @@ int main(int argc, char* argv[]) {
         num_runs = img_path_vec.size();
     }
 
-    std::cout << "Images: " << img_path_vec << std::endl;
+    for (auto const& i: img_path_vec) {
+		std::cout << i << " ";
+	}
 
     // Load model
     std::unique_ptr<tflite::FlatBufferModel> model = tflite::FlatBufferModel::BuildFromFile(filename);
