@@ -129,9 +129,14 @@ int main(int argc, char* argv[]) {
     string img_save_name = "";
 
     if (dataset_toggle == 1) { //VOC
+        std::cout << "Dataset toggle: VOC2007 FULL test directory." << std::endl;
+        string img_dir = "../../datasets/VOCdevkit_test/VOC2007/JPEGImages/";
+        
         num_runs = 50;
+
     } else if (dataset_toggle == 2) { //person
-        string img_directory = "../../datasets/VOCdevkit_test/VOC2007/JPEGImages/";
+        std::cout << "Dataset toggle: VOC2007 PERSON test directory." << std::endl;
+        string img_dir = "../../datasets/VOCdevkit_test/VOC2007/JPEGImages/";
         string img_csv = "../../datasets/2007_person_test.csv";
 
         std::ifstream file(img_csv);
@@ -139,16 +144,18 @@ int main(int argc, char* argv[]) {
         file >> row;
 
         while (file >> row) {
-            img_path_vec.push_back(img_directory + row[0]);
+            img_path_vec.push_back(img_dir + row[0]);
         }
 
         // num_runs = img_path_vec.size();
         num_runs = 50;
 
     } else if (dataset_toggle == 3) { //test_images
+        std::cout << "Dataset toggle: VOC2007 full test directory." << std::endl;
+        string img_dir = "../../datasets/test_images/";
+
         DIR *dir;
         struct dirent *ent;
-        string img_dir = "../../datasets/test_images/";
         if ((dir = opendir (img_dir.c_str())) != NULL) {
             while ((ent = readdir (dir)) != NULL) {
                 std::string filename(ent->d_name);
