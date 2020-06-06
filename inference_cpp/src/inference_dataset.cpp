@@ -153,7 +153,8 @@ int main(int argc, char* argv[]) {
             return EXIT_FAILURE;
         }
         
-        num_runs = img_path_vec.size();
+        // num_runs = img_path_vec.size();
+        num_runs = 50;
 
     } else if (dataset_toggle == 2) { //person
         std::cout << "Dataset toggle: VOC2007 PERSON test directory." << std::endl;
