@@ -52,7 +52,7 @@ void fill_buffer_with_mat(cv::Mat input, float* to_inp, int height, int width,in
 
 int main(int argc, char* argv[]) {
     if (argc != 4) {
-        fprintf(stderr, "./bin/inference_trial <(string) tflite model> <(float) confidence_threshold> <(float) confidence_threshold>\n");
+        fprintf(stderr, "./bin/inference_trial <(string) tflite model> <(float) confidence_threshold> <(float) iou_threshold>\n");
         return 1;
     }
 
