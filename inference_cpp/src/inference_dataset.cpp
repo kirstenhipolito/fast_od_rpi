@@ -132,7 +132,24 @@ int main(int argc, char* argv[]) {
         std::cout << "Dataset toggle: VOC2007 FULL test directory." << std::endl;
         string img_dir = "../../datasets/VOCdevkit_test/VOC2007/JPEGImages/";
         
-        num_runs = 50;
+        DIR *dir;
+        struct dirent *ent;
+        if ((dir = opendir (img_dir.c_str())) != NULL) {
+            while ((ent = readdir (dir)) != NULL) {
+                std::string filename(ent->d_name);
+                if (filename.find(".jpg") != string::npos){
+                    img_path_vec.push_back(img_dir+filename);
+                }
+                
+            }
+            closedir (dir);
+        } else {
+            /* could not open directory */
+            perror ("");
+            return EXIT_FAILURE;
+        }
+        
+        num_runs = img_path_vec.size();
 
     } else if (dataset_toggle == 2) { //person
         std::cout << "Dataset toggle: VOC2007 PERSON test directory." << std::endl;
@@ -151,7 +168,7 @@ int main(int argc, char* argv[]) {
         num_runs = 50;
 
     } else if (dataset_toggle == 3) { //test_images
-        std::cout << "Dataset toggle: VOC2007 full test directory." << std::endl;
+        std::cout << "Dataset toggle: test_images directory" << std::endl;
         string img_dir = "../../datasets/test_images/";
 
         DIR *dir;
@@ -174,6 +191,7 @@ int main(int argc, char* argv[]) {
         num_runs = img_path_vec.size();
     }
 
+    std::cout << "Images: " << std::endl;
     for (auto const& i: img_path_vec) {
 		std::cout << i << std::endl;
 	}
@@ -238,19 +256,8 @@ int main(int argc, char* argv[]) {
 
         vec_boxes = decode_detections((Eigen::MatrixXf) y_pred, confidence_thresh, iou_thresh, top_k, image_height, image_width);
         std::cout << vec_boxes << std::endl;
-        
-        // switch (dataset_toggle) {
-        //     case 1: //VOC
-        //         break;
-        //     case 2: //person
-        //         img_save_name = "out/"+row[0];
-        //         break;
-        //     case 3: //test_images
-        //         img_save_name = img_path.substr(img_path.find_last_of("/") + 1); 
-        //         break;
-        // }
 
-        img_save_name = img_path.substr(img_path.find_last_of("/") + 1); 
+        img_save_name = "out/"+(img_path.substr(img_path.find_last_of("/") + 1)); 
 
         draw_bounding_boxes_save(resized,vec_boxes, img_save_name);
 

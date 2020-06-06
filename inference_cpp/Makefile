@@ -16,6 +16,13 @@ inference_dataset:
 	../../compute-engine/third_party/tensorflow/tensorflow/lite/tools/make/gen/linux_aarch64/lib/libtensorflow-lite.a \
 	-Wl,--no-export-dynamic -Wl,--exclude-libs,ALL -Wl,--gc-sections -Wl,--as-needed -lstdc++ -lpthread -lm -ldl `pkg-config --cflags --libs opencv4`
 
+run_inference_dataset: ./bin/inference_camera
+	rm -rf out
+	mkdir out
+	./bin/inference_camera $(ARGS)
+	zip -r out_new.zip out
+	
+
 inference_camera_unknowngcc:
 		aarch64-unknown-linux-gnu-g++ -O3 -DNDEBUG -fPIC -DTFLITE_WITH_RUY --std=c++11 -march=armv8-a -funsafe-math-optimizations -ftree-vectorize -fPIC \
 		-I../../compute-engine/larq_compute_engine/tflite/cc -I../../compute-engine -I../../compute-engine/third_party/tensorflow -I../../compute-engine/third_party/tensorflow/tensorflow/lite/tools/make/downloads/ \
@@ -33,7 +40,6 @@ inference_camera_unknowngcc:
 		-o bin/inference_camera obj/inference_camera.o obj/decode_detections.o \
 		../../compute-engine/third_party/tensorflow/tensorflow/lite/tools/make/gen/linux_aarch64/lib/libtensorflow-lite.a \
 		-Wl,--no-export-dynamic -Wl,--exclude-libs,ALL -Wl,--gc-sections -Wl,--as-needed -lstdc++ -lpthread -lm -ldl `pkg-config --cflags --libs opencv4`
-
 
 inference_camera:
 	aarch64-linux-gnu-g++ -O3 -DNDEBUG -fPIC -DTFLITE_WITH_RUY --std=c++11 -march=armv8-a -funsafe-math-optimizations -ftree-vectorize -fPIC \
