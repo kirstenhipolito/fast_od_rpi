@@ -124,22 +124,31 @@ int main(int argc, char* argv[]) {
     string img_path = "";
     string img_save_name = "";
 
-    string img_directory = "../../datasets/VOCdevkit_test/VOC2007/JPEGImages/";
-    string img_csv = "../../datasets/2007_person_test.csv";
+
     
-    std::ifstream file(img_csv);
-    CSVRow row;
-    file >> row;
+    
 
     if (dataset_toggle == 1) { //VOC
         num_runs = 50;
     } else if (dataset_toggle == 2) { //person
-        num_runs = 50;
         std::istream& operator>>(std::istream& str, CSVRow& data)
         {
             data.readNextRow(str);
             return str;
         }
+        string img_directory = "../../datasets/VOCdevkit_test/VOC2007/JPEGImages/";
+        string img_csv = "../../datasets/2007_person_test.csv";
+
+        std::ifstream file(img_csv);
+        CSVRow row;
+        file >> row;
+
+        while (file >> row) {
+            img_path_vec.push_back(img_directory + row[0];);
+        }
+
+        // num_runs = img_path_vec.size();
+        num_runs = 50;
 
     } else if (dataset_toggle == 3) { //test_images
         DIR *dir;
@@ -187,17 +196,7 @@ int main(int argc, char* argv[]) {
     std::cout << std::setprecision(6);
 
     for (int i = 0; i < num_runs; i++) {
-        switch (dataset_toggle) {
-            case 1: //VOC
-                break;
-            case 2: //person
-                file >> row;
-                img_path = img_directory + row[0];
-                break;
-            case 3: //test_images
-                img_path = img_path_vec[i];
-                break;
-        }
+        img_path = img_path_vec[i];
 
         auto start_inference = std::chrono::steady_clock::now();
 
