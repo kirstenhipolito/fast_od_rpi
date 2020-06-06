@@ -61,6 +61,7 @@ int main(int argc, char* argv[]) {
     int num_runs = 0;
     float ave_invoke_ms = 0;
     float ave_inference_ms = 0;
+    float ave_livestream_ms = 0;
     int num_threads = 4;
 
     const int y_pred_rows = 2268;
@@ -148,10 +149,15 @@ int main(int argc, char* argv[]) {
         auto end_inference = std::chrono::steady_clock::now();
 
         cv::imshow("Camera View",resized);
+
+        auto end_livestream = std::chrono::steady_clock::now();
+
         std::cout << "Time of invoke (ms/FPS): " << (float) std::chrono::duration_cast<std::chrono::milliseconds>(end_invoke - start_invoke).count() << " / " << 1000/(float)(std::chrono::duration_cast<std::chrono::milliseconds>(end_invoke - start_invoke).count()) << std::endl;
         std::cout << "Time of inference (ms/FPS): " << (float) std::chrono::duration_cast<std::chrono::milliseconds>(end_inference - start_inference).count() << " / " << 1000/(float)(std::chrono::duration_cast<std::chrono::milliseconds>(end_inference - start_inference).count()) << std::endl;
+        std::cout << "Time of livestream (ms/FPS): " << (float) std::chrono::duration_cast<std::chrono::milliseconds>(end_livestream - start_inference).count() << " / " << 1000/(float)(std::chrono::duration_cast<std::chrono::milliseconds>(end_livestream - start_inference).count()) << std::endl;
         ave_invoke_ms += (float) std::chrono::duration_cast<std::chrono::milliseconds>(end_invoke - start_invoke).count();
         ave_inference_ms += (float) std::chrono::duration_cast<std::chrono::milliseconds>(end_inference - start_inference).count();
+        ave_livestream_ms += (float) std::chrono::duration_cast<std::chrono::milliseconds>(end_livestream - start_inference).count();
         num_runs += 1;
 
       if(cv::waitKey(30) >= 0) break;
@@ -159,6 +165,7 @@ int main(int argc, char* argv[]) {
 
     std::cout << "Average invoke time (ms/FPS): " << (float)ave_invoke_ms/num_runs << " / " << num_runs/((float)ave_invoke_ms/1000) << std::endl;
     std::cout << "Average inference time (ms/FPS): " << (float)ave_inference_ms/num_runs << " / " << num_runs/((float)ave_inference_ms/1000) << std::endl;
+    std::cout << "Average livestream time (ms/FPS): " << (float)ave_livestream_ms/num_runs << " / " << num_runs/((float)ave_livestream_ms/1000) << std::endl;
 
     return 0;
 }
