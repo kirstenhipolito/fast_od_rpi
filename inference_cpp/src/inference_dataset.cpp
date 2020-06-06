@@ -9,6 +9,7 @@
 #include <sstream>
 #include <vector>
 #include <dirent.h>
+#include <cstddef>   
 
 #include "decode_detections.hpp"
 
@@ -123,6 +124,7 @@ int main(int argc, char* argv[]) {
 
     int dataset_toggle = (int) std::stoi(argv[4]);
 
+    std::vector<string> img_path_vec;
     string img_path = "";
     string img_save_name = "";
 
@@ -132,6 +134,32 @@ int main(int argc, char* argv[]) {
     std::ifstream file(img_csv);
     CSVRow row;
     file >> row;
+
+    if (dataset_toggle == 1) { //VOC
+        num_runs = 50;
+    } else if (dataset_toggle == 2) { //person
+        num_runs = 50;
+
+    } else if (dataset_toggle == 3) { //test_images
+        DIR *dir;
+        struct dirent *ent;
+        string img_dir = "../../datasets/test_images";
+        if ((dir = opendir (img_dir)) != NULL) {
+            while ((ent = readdir (dir)) != NULL) {
+                printf ("%s\n", ent->d_name);
+                img_path_vec.pushback(img_dir+ent->d_name);
+            }
+            closedir (dir);
+        } else {
+            /* could not open directory */
+            perror ("");
+            return EXIT_FAILURE;
+        }
+        
+        num_runs = img_path_vec.size();
+    }
+
+    std::cout << "Images: " << img_path_vec << std::endl;
 
     // Load model
     std::unique_ptr<tflite::FlatBufferModel> model = tflite::FlatBufferModel::BuildFromFile(filename);
@@ -166,6 +194,7 @@ int main(int argc, char* argv[]) {
                 img_path = img_directory + row[0];
                 break;
             case 3: //test_images
+                img_path = img_path_vec[i];
                 break;
         }
 
@@ -210,6 +239,7 @@ int main(int argc, char* argv[]) {
                 img_save_name = "out/"+row[0];
                 break;
             case 3: //test_images
+                img_save_name = img_path.substr(img_path.find_last_of("/") + 1); 
                 break;
         }
 
