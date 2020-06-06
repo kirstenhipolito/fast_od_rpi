@@ -103,7 +103,7 @@ int main(int argc, char* argv[]) {
     float ave_inference_ms = 0;
     int num_threads = 4;
 
-    const int y_pred_rows = 2006;
+    const int y_pred_rows = 2268;
   	const int y_pred_cols = 33;
     cv::Mat image;
     cv::Mat resized;
