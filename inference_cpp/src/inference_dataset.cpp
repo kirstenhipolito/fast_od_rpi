@@ -148,11 +148,14 @@ int main(int argc, char* argv[]) {
     } else if (dataset_toggle == 3) { //test_images
         DIR *dir;
         struct dirent *ent;
-        string img_dir = "../../datasets/test_images";
+        string img_dir = "../../datasets/test_images/";
         if ((dir = opendir (img_dir.c_str())) != NULL) {
             while ((ent = readdir (dir)) != NULL) {
                 printf ("%s\n", ent->d_name);
-                img_path_vec.push_back(img_dir+ent->d_name);
+                if (ent->d_name.find(".jpg") != string::npos){
+                    img_path_vec.push_back(img_dir+ent->d_name);
+                }
+                
             }
             closedir (dir);
         } else {
