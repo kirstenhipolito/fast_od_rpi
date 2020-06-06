@@ -199,7 +199,7 @@ int main(int argc, char* argv[]) {
     for (auto const& i: img_path_vec) {
 		std::cout << i << std::endl;
 	}
-
+    std::cout << std::endl;
     // Load model
     std::unique_ptr<tflite::FlatBufferModel> model = tflite::FlatBufferModel::BuildFromFile(filename);
     TFLITE_MINIMAL_CHECK(model != nullptr);
@@ -278,6 +278,6 @@ int main(int argc, char* argv[]) {
 
     std::cout << "Average invoke time (ms/FPS): " << (float)ave_invoke_ms/num_runs << " / " << num_runs/((float)ave_invoke_ms/1000) << std::endl;
     std::cout << "Average inference time (ms/FPS): " << (float)ave_inference_ms/num_runs << " / " << num_runs/((float)ave_inference_ms/1000) << std::endl;
-
+    std::cout << std::endl;
     return 0;
 }

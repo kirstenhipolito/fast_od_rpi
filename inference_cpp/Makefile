@@ -106,8 +106,11 @@ all:
 clean:
 	rm -rf bin
 	rm -rf obj
+	rm -rf out
+	rm *.zip
 	mkdir bin
 	mkdir obj
+	mkdir out
 
 rm-out:
 	rm -rf out
