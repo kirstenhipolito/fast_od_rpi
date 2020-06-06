@@ -1,3 +1,5 @@
+SHELL:=/bin/bash
+
 inference_dataset:
 	aarch64-linux-gnu-g++ -O3 -DNDEBUG -fPIC -DTFLITE_WITH_RUY --std=c++11 -march=armv8-a -funsafe-math-optimizations -ftree-vectorize -fPIC \
 	-I../../compute-engine/larq_compute_engine/tflite/cc -I../../compute-engine -I../../compute-engine/third_party/tensorflow -I../../compute-engine/third_party/tensorflow/tensorflow/lite/tools/make/downloads/ \
@@ -19,8 +21,9 @@ inference_dataset:
 run_inference_dataset: ./bin/inference_camera
 	rm -rf out
 	mkdir out
-	./bin/inference_dataset $(model) $(conf) $(iou) $(data)
-	# ZIP_FILE:=out_$(basename $model .tflite)_$(conf)_$(iou)_$(data).zip
+	./bin/inference_dataset $(model) $(conf) $(iou) $(data) | tee out/output.txt
+	filename=out_$(basename $model .tflite)_$(conf)_$(iou)_$(data)
+	echo $filename
 	zip -r out_$(basename $model .tflite)_$(conf)_$(iou)_$(data).zip out
 	
 
