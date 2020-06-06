@@ -86,11 +86,7 @@ class CSVRow
         std::vector<std::string>    m_data;
 };
 
-std::istream& operator>>(std::istream& str, CSVRow& data)
-{
-    data.readNextRow(str);
-    return str;
-}
+
 
 int main(int argc, char* argv[]) {
     if (argc != 5) {
@@ -139,15 +135,20 @@ int main(int argc, char* argv[]) {
         num_runs = 50;
     } else if (dataset_toggle == 2) { //person
         num_runs = 50;
+        std::istream& operator>>(std::istream& str, CSVRow& data)
+        {
+            data.readNextRow(str);
+            return str;
+        }
 
     } else if (dataset_toggle == 3) { //test_images
         DIR *dir;
         struct dirent *ent;
         string img_dir = "../../datasets/test_images";
-        if ((dir = opendir (img_dir)) != NULL) {
+        if ((dir = opendir (img_dir.c_str())) != NULL) {
             while ((ent = readdir (dir)) != NULL) {
                 printf ("%s\n", ent->d_name);
-                img_path_vec.pushback(img_dir+ent->d_name);
+                img_path_vec.push_back(img_dir+ent->d_name);
             }
             closedir (dir);
         } else {
