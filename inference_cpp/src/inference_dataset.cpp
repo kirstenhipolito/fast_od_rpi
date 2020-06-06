@@ -8,6 +8,7 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <dirent.h>
 
 #include "decode_detections.hpp"
 
@@ -91,8 +92,8 @@ std::istream& operator>>(std::istream& str, CSVRow& data)
 }
 
 int main(int argc, char* argv[]) {
-    if (argc != 2) {
-        fprintf(stderr, "./bin/inference_trial <tflite model>\n");
+    if (argc != 5) {
+        fprintf(stderr, "./bin/inference_trial <(string) tflite model> <(float) confidence_threshold> <(float) confidence_threshold> <(int) dataset_toggle: 1=VOC, 2=person, 3=test_images>\n");
         return 1;
     }
 
@@ -113,15 +114,21 @@ int main(int argc, char* argv[]) {
     int image_height = 300;
     int image_width = 300;
     int image_channels = 3;
-    float confidence_thresh = 0.01;
-    float iou_thresh = 0.45;
+    float confidence_thresh = (float) std::stod(argv[2]);
+    float iou_thresh = (float) std::stod(argv[3]);
     int top_k = 200;
+
+    std::cout << "Using confidence threshold: " << confidence_thresh << std::endl;
+    std::cout << "Using iou threshold: " << iou_thresh << std::endl;
+
+    int dataset_toggle = (int) std::stoi(argv[4]);
+
+    string img_path = "";
+    string img_save_name = "";
 
     string img_directory = "../../datasets/VOCdevkit_test/VOC2007/JPEGImages/";
     string img_csv = "../../datasets/2007_person_test.csv";
-    // string img_path = "../../datasets/VOCdevkit_test/VOC2007/JPEGImages/000043.jpg";
-    string img_path = "";
-
+    
     std::ifstream file(img_csv);
     CSVRow row;
     file >> row;
@@ -147,14 +154,20 @@ int main(int argc, char* argv[]) {
     // Allocate tensor buffers.
     TFLITE_MINIMAL_CHECK(interpreter->AllocateTensors() == kTfLiteOk);
 
-    // std::cout << interpreter->get_output_details() << std::endl;
-
     std::cout << std::fixed;
     std::cout << std::setprecision(6);
 
     for (int i = 0; i < num_runs; i++) {
-        file >> row;
-        img_path = img_directory + row[0];
+        switch (dataset_toggle) {
+            case 1: //VOC
+                break;
+            case 2: //person
+                file >> row;
+                img_path = img_directory + row[0];
+                break;
+            case 3: //test_images
+                break;
+        }
 
         auto start_inference = std::chrono::steady_clock::now();
 
@@ -187,11 +200,20 @@ int main(int argc, char* argv[]) {
             }
         }
 
-	// std::cout << "out_size: " << interpreter->outputs().size() << std::endl;
-
         vec_boxes = decode_detections((Eigen::MatrixXf) y_pred, confidence_thresh, iou_thresh, top_k, image_height, image_width);
         std::cout << vec_boxes << std::endl;
-        draw_bounding_boxes_save(resized,vec_boxes, "out/"+row[0]);
+        
+        switch (dataset_toggle) {
+            case 1: //VOC
+                break;
+            case 2: //person
+                img_save_name = "out/"+row[0];
+                break;
+            case 3: //test_images
+                break;
+        }
+
+        draw_bounding_boxes_save(resized,vec_boxes, );
 
         auto end_inference = std::chrono::steady_clock::now();
 

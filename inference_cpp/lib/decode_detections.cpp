@@ -6,12 +6,10 @@ MatrixXf decode_detections(const MatrixXf & y_pred, const float & confidence_thr
 	const int y_pred_cols = y_pred.cols();
 	const int y_raw_cols = y_pred_cols - 8;
 	const int n_classes = y_raw_cols-4;
-
+	
 	MatrixXf y_pred_decoded_raw(y_pred_rows,y_raw_cols);
 
-	cout << "Decode Detection sees: " << y_pred.rows() << "rows and " << y_pred.cols() << " cols." << endl;
-	cout << "Sample row is: " << y_pred.row(2005) << endl;
-
+	
 
 	y_pred_decoded_raw = y_pred.block(0,0,y_pred_rows,y_raw_cols);
 	y_pred_decoded_raw.block(0,y_raw_cols-2,y_pred_rows,2) = (y_pred_decoded_raw.block(0,y_raw_cols-2,y_pred_rows,2).array() * y_pred.block(0,y_pred_cols-2,y_pred_rows,2).array()).exp();
@@ -27,29 +25,18 @@ MatrixXf decode_detections(const MatrixXf & y_pred, const float & confidence_thr
 	y_pred_decoded_raw.col(y_raw_cols-2) *= img_width;
 	y_pred_decoded_raw.col(y_raw_cols-4) *= img_width;
 
-	cout << "y_pred_decoded_raw is: " << y_pred_decoded_raw.rows() << " rows and " << y_pred_decoded_raw.cols() << " cols." << endl;
-	cout << "Sample row is: " << y_pred_decoded_raw.row(2005) << endl;
 
 	Matrix <float, Dynamic, 6> pred;
 	for (int class_id = 1; class_id < n_classes; class_id++){
-		cout << "Class ID: " << class_id << endl;
 		MatrixXf single_class(y_pred_rows,5);
 		single_class.col(0) = y_pred_decoded_raw.col(class_id);
 		single_class.block(0,1,y_pred_rows,4) = y_pred_decoded_raw.block(0,y_raw_cols-4,y_pred_rows,4);
-
-		// cout << "single_class is: " << single_class << endl;
-
+	  	
 		VectorXf Thresh_Met(y_pred_rows,1);
 		Thresh_Met = single_class.col(0);
 		Thresh_Met = (Thresh_Met.array() > confidence_thresh).select(Thresh_Met, 0);
-
-		//cout << "Thresh_Met is: " << Thresh_Met << endl;
-
 		MatrixXb non_zeros(y_pred_rows,1);
 		non_zeros = Thresh_Met.cast<bool>().rowwise().any();
-
-		//cout << "non-zeros is: " << non_zeros << endl;
-
 		MatrixXf threshold_met(non_zeros.count(),5);
 
 		int j=0;
@@ -58,14 +45,9 @@ MatrixXf decode_detections(const MatrixXf & y_pred, const float & confidence_thr
 				threshold_met.row(j++) = single_class.row(i);
 			}
 		}
-		cout << "threshold_met is: " << threshold_met.rows() << " rows and " << threshold_met.cols() << " cols." << endl;
-
 
 
 		MatrixXf maxima = vectorized_nms(threshold_met, iou_threshold);
-
-		cout << "maxima is: " << maxima << endl;
-
 		const int maxima_rows = maxima.rows();
 
 		// Including class in output
@@ -74,14 +56,11 @@ MatrixXf decode_detections(const MatrixXf & y_pred, const float & confidence_thr
 		maxima_output.block(0,1,maxima_rows,5) = maxima;
 
 		if(maxima_rows!=0){
-			int pred_rows = pred.rows();
+			int pred_rows = pred.rows(); 		
 			pred.conservativeResize(pred_rows+maxima_rows,NoChange);
 			pred.block(pred_rows,0,maxima_rows,6) = maxima_output;
 		}
 	}
-
-	cout << "pred is: " << pred.rows() << " rows and " << pred.cols() << " cols." << endl;
-
 	Matrix <float,Dynamic,6> y_pred_decoded;
 
 	if (pred.rows()>top_k){
@@ -118,7 +97,7 @@ MatrixXf decode_detections(const MatrixXf & y_pred, const float & confidence_thr
     //   }
     // }
 
-
+	
 
 	return y_pred_decoded;
 }

@@ -51,8 +51,8 @@ void fill_buffer_with_mat(cv::Mat input, float* to_inp, int height, int width,in
 }
 
 int main(int argc, char* argv[]) {
-    if (argc != 2) {
-        fprintf(stderr, "./bin/inference_trial <tflite model>\n");
+    if (argc != 4) {
+        fprintf(stderr, "./bin/inference_trial <(string) tflite model> <(float) confidence_threshold> <(float) confidence_threshold>\n");
         return 1;
     }
 
@@ -73,9 +73,12 @@ int main(int argc, char* argv[]) {
     int image_height = 300;
     int image_width = 300;
     int image_channels = 3;
-    float confidence_thresh = 0.3;
-    float iou_thresh = 0.45;
+    float confidence_thresh = (float) std::stod(argv[2]);
+    float iou_thresh = (float) std::stod(argv[3]);
     int top_k = 200;
+
+    std::cout << "Using confidence threshold: " << confidence_thresh << std::endl;
+    std::cout << "Using iou threshold: " << iou_thresh << std::endl;
 
     cv::VideoCapture Camera(0); //capture the video from rpi camera
 
