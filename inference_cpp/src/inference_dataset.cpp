@@ -151,8 +151,7 @@ int main(int argc, char* argv[]) {
         string img_dir = "../../datasets/test_images/";
         if ((dir = opendir (img_dir.c_str())) != NULL) {
             while ((ent = readdir (dir)) != NULL) {
-                printf ("%s\n", ent->d_name);
-                string filename(ent->d_name);
+                std::string filename(ent->d_name);
                 if (filename.find(".jpg") != string::npos){
                     img_path_vec.push_back(img_dir+filename);
                 }
@@ -169,7 +168,7 @@ int main(int argc, char* argv[]) {
     }
 
     for (auto const& i: img_path_vec) {
-		std::cout << i << " ";
+		std::cout << i << std::endl;
 	}
 
     // Load model
