@@ -232,16 +232,18 @@ int main(int argc, char* argv[]) {
         vec_boxes = decode_detections((Eigen::MatrixXf) y_pred, confidence_thresh, iou_thresh, top_k, image_height, image_width);
         std::cout << vec_boxes << std::endl;
         
-        switch (dataset_toggle) {
-            case 1: //VOC
-                break;
-            case 2: //person
-                img_save_name = "out/"+row[0];
-                break;
-            case 3: //test_images
-                img_save_name = img_path.substr(img_path.find_last_of("/") + 1); 
-                break;
-        }
+        // switch (dataset_toggle) {
+        //     case 1: //VOC
+        //         break;
+        //     case 2: //person
+        //         img_save_name = "out/"+row[0];
+        //         break;
+        //     case 3: //test_images
+        //         img_save_name = img_path.substr(img_path.find_last_of("/") + 1); 
+        //         break;
+        // }
+
+        img_save_name = img_path.substr(img_path.find_last_of("/") + 1); 
 
         draw_bounding_boxes_save(resized,vec_boxes, img_save_name);
 
