@@ -23,8 +23,8 @@ run_inference_dataset: ./bin/inference_camera
 	mkdir out
 	./bin/inference_dataset $(model) $(conf) $(iou) $(data) | tee out/output.txt
 	filename=$(basename $(model) .tflite)
-	echo $filename
-	zip -r out_$(basename $model .tflite)_$(conf)_$(iou)_$(data).zip out
+	echo $(filename)
+	zip -r out_$(basename $(model) .tflite)_$(conf)_$(iou)_$(data).zip out
 	
 
 inference_camera_unknowngcc:
