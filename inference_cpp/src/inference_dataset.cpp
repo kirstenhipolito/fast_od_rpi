@@ -86,7 +86,11 @@ class CSVRow
         std::vector<std::string>    m_data;
 };
 
-
+std::istream& operator>>(std::istream& str, CSVRow& data)
+{
+    data.readNextRow(str);
+    return str;
+};
 
 int main(int argc, char* argv[]) {
     if (argc != 5) {
@@ -124,18 +128,9 @@ int main(int argc, char* argv[]) {
     string img_path = "";
     string img_save_name = "";
 
-
-    
-    
-
     if (dataset_toggle == 1) { //VOC
         num_runs = 50;
     } else if (dataset_toggle == 2) { //person
-        std::istream& operator>>(std::istream& str, CSVRow& data)
-        {
-            data.readNextRow(str);
-            return str;
-        }
         string img_directory = "../../datasets/VOCdevkit_test/VOC2007/JPEGImages/";
         string img_csv = "../../datasets/2007_person_test.csv";
 
