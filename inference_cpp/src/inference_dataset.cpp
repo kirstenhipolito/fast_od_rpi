@@ -152,8 +152,9 @@ int main(int argc, char* argv[]) {
         if ((dir = opendir (img_dir.c_str())) != NULL) {
             while ((ent = readdir (dir)) != NULL) {
                 printf ("%s\n", ent->d_name);
-                if (ent->d_name.find(".jpg") != string::npos){
-                    img_path_vec.push_back(img_dir+ent->d_name);
+                string filename(ent->d_name);
+                if (filename.find(".jpg") != string::npos){
+                    img_path_vec.push_back(img_dir+filename);
                 }
                 
             }
