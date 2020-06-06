@@ -43,9 +43,9 @@ void fill_buffer_with_mat(cv::Mat input, float* to_inp, int height, int width,in
     for(int j = 0; j < width; j++){
       des_pos = (i * width + j) * channels;
       cv::Vec3b intensity = input.at<cv::Vec3b>(i, j);
-      to_inp[des_pos] = intensity.val[2] / 255.0f; //R
-      to_inp[des_pos+1] = intensity.val[1] / 255.0f; //G
-      to_inp[des_pos+2] = intensity.val[0] / 255.0f; //B
+      to_inp[des_pos] = (float) intensity.val[2]; //R
+      to_inp[des_pos+1] = (float) intensity.val[1]; //G
+      to_inp[des_pos+2] = (float) intensity.val[0]; //B
     }
   }
 }

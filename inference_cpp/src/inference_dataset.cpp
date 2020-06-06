@@ -42,9 +42,9 @@ void fill_buffer_with_mat(cv::Mat input, float* to_inp, int height, int width,in
     for(int j = 0; j < width; j++){
       des_pos = (i * width + j) * channels;
       cv::Vec3b intensity = input.at<cv::Vec3b>(i, j);
-      to_inp[des_pos] = intensity.val[2] / 255.0f; //R
-      to_inp[des_pos+1] = intensity.val[1] / 255.0f; //G
-      to_inp[des_pos+2] = intensity.val[0] / 255.0f; //B
+      to_inp[des_pos] = (float) intensity.val[2]; //R
+      to_inp[des_pos+1] = (float) intensity.val[1]; //G
+      to_inp[des_pos+2] = (float) intensity.val[0]; //B
     }
   }
 }
@@ -88,7 +88,7 @@ std::istream& operator>>(std::istream& str, CSVRow& data)
 {
     data.readNextRow(str);
     return str;
-}  
+}
 
 int main(int argc, char* argv[]) {
     if (argc != 2) {
@@ -116,7 +116,7 @@ int main(int argc, char* argv[]) {
     float confidence_thresh = 0.01;
     float iou_thresh = 0.45;
     int top_k = 4;
-    
+
     string img_directory = "../../datasets/VOCdevkit_test/VOC2007/JPEGImages/";
     string img_csv = "../../datasets/2007_person_test.csv";
     // string img_path = "../../datasets/VOCdevkit_test/VOC2007/JPEGImages/000043.jpg";
@@ -158,20 +158,20 @@ int main(int argc, char* argv[]) {
 
         auto start_inference = std::chrono::steady_clock::now();
 
-        // Fill input buffers, resize image and load into input  
+        // Fill input buffers, resize image and load into input
         image = cv::imread(img_path, cv::IMREAD_COLOR);
         if (image.empty()) {
             std::cout << "Could not read the image: " << img_path << std::endl;
-        } 
+        }
         cv::resize(image, resized, cv::Size(image_width,image_height));
         // memcpy(interpreter->typed_input_tensor<float>(0), image.data, image.total() * image.elemSize());
         fill_buffer_with_mat(resized,interpreter->typed_input_tensor<float>(0),image_height,image_width,image_channels);
-        
+
         auto start_invoke = std::chrono::steady_clock::now();
 
         // Run inference
         TFLITE_MINIMAL_CHECK(interpreter->Invoke() == kTfLiteOk);
-        
+
         // Get end clock
         auto end_invoke = std::chrono::steady_clock::now();
 
@@ -186,9 +186,9 @@ int main(int argc, char* argv[]) {
                 y_pred(i,j) = output[des_pos];
             }
         }
-	
+
 	// std::cout << "out_size: " << interpreter->outputs().size() << std::endl;
-	
+
         vec_boxes = decode_detections((Eigen::MatrixXf) y_pred, confidence_thresh, iou_thresh, top_k, image_height, image_width);
         std::cout << vec_boxes << std::endl;
         draw_bounding_boxes_save(resized,vec_boxes, "out/"+row[0]);
