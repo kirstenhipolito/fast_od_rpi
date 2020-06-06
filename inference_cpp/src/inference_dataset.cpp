@@ -94,8 +94,8 @@ std::istream& operator>>(std::istream& str, CSVRow& data)
 
 int main(int argc, char* argv[]) {
     if (argc != 5) {
-        printf("If using make, proper format: make run_inference_dataset model=<path to model> conf=<float> iou=<float> data=<float>");
-        printf("E.g.: make run_inference_dataset model=../models_trained/binarized_ssd_x.tflite conf=0.5 iou=0.3 data=3");
+        printf("If using make, proper format: make run_inference_dataset model=<path to model> conf=<float> iou=<float> data=<float>\n");
+        printf("E.g.: make run_inference_dataset model=../models_trained/binarized_ssd_x.tflite conf=0.5 iou=0.3 data=3\n");
         fprintf(stderr, "./bin/inference_dataset <(string) tflite model> <(float) confidence_threshold> <(float) iou_threshold> <(int) dataset_toggle: 1=VOC, 2=person, 3=test_images>\n");
         return 1;
     }
