@@ -102,6 +102,8 @@ int main(int argc, char* argv[]) {
 
     char* filename = argv[1];
 
+    std::cout << "Using model: " << filename << std::endl;
+
     int num_runs = 50;
     float ave_invoke_ms = 0;
     float ave_inference_ms = 0;
@@ -257,14 +259,15 @@ int main(int argc, char* argv[]) {
         }
 
         vec_boxes = decode_detections((Eigen::MatrixXf) y_pred, confidence_thresh, iou_thresh, top_k, image_height, image_width);
-        std::cout << vec_boxes << std::endl;
+        
 
         img_save_name = "out/"+(img_path.substr(img_path.find_last_of("/") + 1)); 
 
         draw_bounding_boxes_save(resized,vec_boxes, img_save_name);
 
         auto end_inference = std::chrono::steady_clock::now();
-
+        std::cout << "Image: \n" << img_path << std::endl;
+        std::cout << "Vec boxes: \n" << vec_boxes << std::endl;
         std::cout << "Time of invoke (ms/FPS): " << (float) std::chrono::duration_cast<std::chrono::milliseconds>(end_invoke - start_invoke).count() << " / " << 1000/(float)(std::chrono::duration_cast<std::chrono::milliseconds>(end_invoke - start_invoke).count()) << std::endl;
         std::cout << "Time of inference (ms/FPS): " << (float) std::chrono::duration_cast<std::chrono::milliseconds>(end_inference - start_inference).count() << " / " << 1000/(float)(std::chrono::duration_cast<std::chrono::milliseconds>(end_inference - start_inference).count()) << std::endl;
         ave_invoke_ms += (float) std::chrono::duration_cast<std::chrono::milliseconds>(end_invoke - start_invoke).count();
