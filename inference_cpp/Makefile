@@ -22,9 +22,9 @@ run_inference_dataset: ./bin/inference_camera
 	rm -rf out
 	mkdir out
 	./bin/inference_dataset $(model) $(conf) $(iou) $(data) | tee out/output.txt
-	filename=$(basename $(model))
-	echo $(filename)
-	zip -r out_$(basename $(model))_$(conf)_$(iou)_$(data).zip out
+	filename=$(basename $(notdir $(model)))
+	echo $filename
+	zip -r out_$(basename $(notdir $(model)))_$(conf)_$(iou)_$(data).zip out
 	
 
 inference_camera_unknowngcc:
