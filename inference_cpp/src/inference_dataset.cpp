@@ -115,7 +115,7 @@ int main(int argc, char* argv[]) {
     int image_channels = 3;
     float confidence_thresh = 0.01;
     float iou_thresh = 0.45;
-    int top_k = 4;
+    int top_k = 200;
 
     string img_directory = "../../datasets/VOCdevkit_test/VOC2007/JPEGImages/";
     string img_csv = "../../datasets/2007_person_test.csv";

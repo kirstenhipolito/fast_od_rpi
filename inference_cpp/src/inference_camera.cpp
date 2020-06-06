@@ -75,7 +75,7 @@ int main(int argc, char* argv[]) {
     int image_channels = 3;
     float confidence_thresh = 0.3;
     float iou_thresh = 0.45;
-    int top_k = 4;
+    int top_k = 200;
 
     cv::VideoCapture Camera(0); //capture the video from rpi camera
 
