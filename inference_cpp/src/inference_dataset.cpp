@@ -213,7 +213,7 @@ int main(int argc, char* argv[]) {
                 break;
         }
 
-        draw_bounding_boxes_save(resized,vec_boxes, );
+        draw_bounding_boxes_save(resized,vec_boxes, img_save_name);
 
         auto end_inference = std::chrono::steady_clock::now();
 
