@@ -94,7 +94,7 @@ std::istream& operator>>(std::istream& str, CSVRow& data)
 
 int main(int argc, char* argv[]) {
     if (argc != 5) {
-        fprintf(stderr, "./bin/inference_trial <(string) tflite model> <(float) confidence_threshold> <(float) confidence_threshold> <(int) dataset_toggle: 1=VOC, 2=person, 3=test_images>\n");
+        fprintf(stderr, "./bin/inference_dataset <(string) tflite model> <(float) confidence_threshold> <(float) iou_threshold> <(int) dataset_toggle: 1=VOC, 2=person, 3=test_images>\n");
         return 1;
     }
 
