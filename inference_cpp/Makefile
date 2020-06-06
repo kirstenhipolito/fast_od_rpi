@@ -19,7 +19,7 @@ inference_dataset:
 run_inference_dataset: ./bin/inference_camera
 	rm -rf out
 	mkdir out
-	./bin/inference_camera $(ARGS)
+	./bin/inference_camera $(model) $(conf) $(iou) $(data)
 	zip -r out_new.zip out
 	
 
