@@ -102,13 +102,18 @@ MatrixXf decode_detections(const MatrixXf & y_pred, const float & confidence_thr
 	return y_pred_decoded;
 }
 
-void draw_bounding_boxes(cv::Mat input, const Ref<const MatrixXf>& boxes){
+void draw_bounding_boxes(cv::Mat input, const Ref<const MatrixXf>& boxes, int mode){
   //classificaions of the PASCAL VOC 2012 Dataset
   string classNames[21] = {"background","aeroplane", "bicycle", "bird",
           "boat","bottle", "bus", "car", "cat",
            "chair", "cow", "diningtable", "dog",
            "horse", "motorbike", "person", "pottedplant",
            "sheep", "sofa", "train", "tvmonitor"};
+
+	if (mode == 2)
+	{
+		classNames[1] = "person";
+	}
 
   //get number of bounding boxes
   int num_boxes = boxes.rows();
