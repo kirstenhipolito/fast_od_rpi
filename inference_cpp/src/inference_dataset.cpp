@@ -105,13 +105,13 @@ int main(int argc, char* argv[]) {
     std::cout << "Using model: " << filename << std::endl;
 
     int num_runs = 50;
-    float ave_loadtime_ms = 0;
-    float ave_invoke_ms = 0;
-    float ave_predec_ms = 0;
-    float ave_decoding_ms = 0;
-    float ave_inference_ms = 0;
-    float ave_display_ms = 0;
-    float ave_whole_ms = 0;
+    float ave_loadtime_us = 0;
+    float ave_invoke_us = 0;
+    float ave_predec_us = 0;
+    float ave_decoding_us = 0;
+    float ave_inference_us = 0;
+    float ave_display_us = 0;
+    float ave_whole_us = 0;
     int num_threads = 4;
 
     int od_mode = (int) std::stoi(argv[5]);
@@ -285,23 +285,23 @@ int main(int argc, char* argv[]) {
         
         std::cout << "Image: \n" << img_path << std::endl;
         std::cout << "Vec boxes: \n" << vec_boxes << std::endl;
-        std::cout << "Time of invoke (ms/FPS): " << (float) std::chrono::duration_cast<std::chrono::milliseconds>(end_invoke - start_invoke).count() << " / " << 1000/(float)(std::chrono::duration_cast<std::chrono::milliseconds>(end_invoke - start_invoke).count()) << std::endl;
-        std::cout << "Time of decoding (NMS + draw) time (ms/FPS): " << (float) std::chrono::duration_cast<std::chrono::milliseconds>(end_inference - start_decoding).count() << " / " << 1000/(float)(std::chrono::duration_cast<std::chrono::milliseconds>(end_inference - start_decoding).count()) << std::endl;
-        std::cout << "Time of inference (ms/FPS): " << (float) std::chrono::duration_cast<std::chrono::milliseconds>(end_inference - start_inference).count() << " / " << 1000/(float)(std::chrono::duration_cast<std::chrono::milliseconds>(end_inference - start_inference).count()) << std::endl;
+        std::cout << "Time of invoke (ms/FPS): " << (float) std::chrono::duration_cast<std::chrono::microseconds>(end_invoke - start_invoke).count() << " / " << 1000000/(float)(std::chrono::duration_cast<std::chrono::microseconds>(end_invoke - start_invoke).count()) << std::endl;
+        std::cout << "Time of decoding (NMS + draw) time (ms/FPS): " << (float) std::chrono::duration_cast<std::chrono::microseconds>(end_inference - start_decoding).count() << " / " << 1000000/(float)(std::chrono::duration_cast<std::chrono::microseconds>(end_inference - start_decoding).count()) << std::endl;
+        std::cout << "Time of inference (ms/FPS): " << (float) std::chrono::duration_cast<std::chrono::microseconds>(end_inference - start_inference).count() << " / " << 1000000/(float)(std::chrono::duration_cast<std::chrono::microseconds>(end_inference - start_inference).count()) << std::endl;
         std::cout << std::endl;
-        ave_invoke_ms += (float) std::chrono::duration_cast<std::chrono::milliseconds>(end_invoke - start_invoke).count();
-        ave_inference_ms += (float) std::chrono::duration_cast<std::chrono::milliseconds>(end_inference - start_inference).count();
-        ave_loadtime_ms += (float) std::chrono::duration_cast<std::chrono::milliseconds>(start_invoke - start_inference).count();
-        ave_predec_ms += (float) std::chrono::duration_cast<std::chrono::milliseconds>(start_decoding - end_invoke).count();
-        ave_decoding_ms += (float) std::chrono::duration_cast<std::chrono::milliseconds>(end_inference - start_decoding).count();
+        ave_invoke_us += (float)std::chrono::duration_cast<std::chrono::microseconds>(end_invoke - start_invoke).count();
+        ave_inference_us += (float)std::chrono::duration_cast<std::chrono::microseconds>(end_inference - start_inference).count();
+        ave_loadtime_us += (float)std::chrono::duration_cast<std::chrono::microseconds>(start_invoke - start_inference).count();
+        ave_predec_us += (float)std::chrono::duration_cast<std::chrono::microseconds>(start_decoding - end_invoke).count();
+        ave_decoding_us += (float)std::chrono::duration_cast<std::chrono::microseconds>(end_inference - start_decoding).count();
 
     }
 
-    std::cout << "Average image load time (ms/FPS): " << (float)ave_loadtime_ms/num_runs << " / " << num_runs/((float)ave_loadtime_ms/1000) << std::endl;
-    std::cout << "Average invoke time (ms/FPS): " << (float)ave_invoke_ms/num_runs << " / " << num_runs/((float)ave_invoke_ms/1000) << std::endl;
-    std::cout << "Average pre-decoding (output extract) time (ms/FPS): " << (float)ave_predec_ms/num_runs << " / " << num_runs/((float)ave_predec_ms/1000) << std::endl;
-    std::cout << "Average decoding (NMS + draw) time (ms/FPS): " << (float)ave_decoding_ms/num_runs << " / " << num_runs/((float)ave_decoding_ms/1000) << std::endl;
-    std::cout << "Average inference time (ms/FPS): " << (float)ave_inference_ms/num_runs << " / " << num_runs/((float)ave_inference_ms/1000) << std::endl;
+    std::cout << "Average image load time (ms/FPS): " << (float)ave_loadtime_us/(num_runs*1000) << " / " << num_runs/((float)ave_loadtime_us/1000000) << std::endl;
+    std::cout << "Average invoke time (ms/FPS): " << (float)ave_invoke_us/(num_runs*1000) << " / " << num_runs/((float)ave_invoke_us/1000000) << std::endl;
+    std::cout << "Average pre-decoding (output extract) time (ms/FPS): " << (float)ave_predec_us/(num_runs*1000) << " / " << num_runs/((float)ave_predec_us/1000000) << std::endl;
+    std::cout << "Average decoding (NMS + draw) time (ms/FPS): " << (float)ave_decoding_us/(num_runs*1000) << " / " << num_runs/((float)ave_decoding_us/1000000) << std::endl;
+    std::cout << "Average inference time (ms/FPS): " << (float)ave_inference_us/(num_runs*1000) << " / " << num_runs/((float)ave_inference_us/1000000) << std::endl;
 
     std::cout << std::endl;
     return 0;
