@@ -23,7 +23,7 @@ run_inference_dataset: ./bin/inference_camera
 	mkdir out
 	./bin/inference_dataset $(model) $(conf) $(iou) $(data) $(od_mode)| tee out/output.txt
 	zip -r out_$(basename $(notdir $(model)))_$(conf)_$(iou)_$(data).zip out
-	
+
 
 inference_camera_unknowngcc:
 		aarch64-unknown-linux-gnu-g++ -O3 -DNDEBUG -fPIC -DTFLITE_WITH_RUY --std=c++11 -march=armv8-a -funsafe-math-optimizations -ftree-vectorize -fPIC \
@@ -60,6 +60,10 @@ inference_camera:
 	-o bin/inference_camera obj/inference_camera.o obj/decode_detections.o \
 	../../compute-engine/third_party/tensorflow/tensorflow/lite/tools/make/gen/linux_aarch64/lib/libtensorflow-lite.a \
 	-Wl,--no-export-dynamic -Wl,--exclude-libs,ALL -Wl,--gc-sections -Wl,--as-needed -lstdc++ -lpthread -lm -ldl `pkg-config --cflags --libs opencv4`
+
+decode_detections_unknowngcc:
+	aarch64-unknown-linux-gnu-g++ -O3 -DNDEBUG -fPIC -DTFLITE_WITH_RUY --std=c++11 -march=armv8-a -funsafe-math-optimizations -ftree-vectorize -fPIC \
+	-I../../compute-engine/third_party/tensorflow/tensorflow/lite/tools/make/downloads/eigen -c lib/decode_detections.cpp -o obj/decode_detections.o `pkg-config --cflags --libs opencv4`
 
 decode_detections:
 	aarch64-linux-gnu-g++ -O3 -DNDEBUG -fPIC -DTFLITE_WITH_RUY --std=c++11 -march=armv8-a -funsafe-math-optimizations -ftree-vectorize -fPIC \
