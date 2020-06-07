@@ -93,10 +93,10 @@ std::istream& operator>>(std::istream& str, CSVRow& data)
 };
 
 int main(int argc, char* argv[]) {
-    if (argc != 5) {
-        printf("If using make, proper format: make run_inference_dataset model=<path to model> conf=<float> iou=<float> data=<float>\n");
-        printf("E.g.: make run_inference_dataset model=../models_trained/binarized_ssd_x.tflite conf=0.5 iou=0.3 data=3\n");
-        fprintf(stderr, "./bin/inference_dataset <(string) tflite model> <(float) confidence_threshold> <(float) iou_threshold> <(int) dataset_toggle: 1=VOC, 2=person, 3=test_images>\n");
+    if (argc != 6) {
+        printf("If using make, proper format: make run_inference_dataset model=<path to model> conf=<float> iou=<float> data=<float> od_mode=<int>\n");
+        printf("E.g.: make run_inference_dataset model=../models_trained/binarized_ssd_x.tflite conf=0.5 iou=0.3 data=3 od_mode=1\n");
+        fprintf(stderr, "./bin/inference_dataset <(string) tflite model> <(float) confidence_threshold> <(float) iou_threshold> <(int) dataset_toggle: 1=VOC, 2=person, 3=test_images> <(int) od_mode: 1=multi, 2=person>\n");
         return 1;
     }
 
@@ -114,10 +114,23 @@ int main(int argc, char* argv[]) {
     float ave_whole_ms = 0;
     int num_threads = 4;
 
+    int od_mode = (int) std::stoi(argv[5]);
+
     const int y_pred_rows = 2268;
-  	const int y_pred_cols = 33;
+  	int y_pred_cols = 0;
+
+    switch (od_mode) {
+        case 1:
+            y_pred_cols = 33;
+            break;
+        case 2:
+            y_pred_cols = 14;
+            break;
+    }
+
     cv::Mat image;
     cv::Mat resized;
+    Eigen::MatrixXf y_pred(y_pred_rows, y_pred_cols);
     Eigen::MatrixXf vec_boxes;
 
     int image_height = 300;
@@ -252,8 +265,6 @@ int main(int argc, char* argv[]) {
         // Get output, decode, and draw bounding boxes
         int output_idx = interpreter->outputs()[0];
         float* output = interpreter->typed_tensor<float>(output_idx);
-
-        Eigen::MatrixXf y_pred(y_pred_rows, y_pred_cols);
 
         for(int i = 0; i < y_pred_rows; i++){
             int des_pos;

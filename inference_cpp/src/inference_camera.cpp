@@ -51,8 +51,8 @@ void fill_buffer_with_mat(cv::Mat input, float* to_inp, int height, int width,in
 }
 
 int main(int argc, char* argv[]) {
-    if (argc != 4) {
-        fprintf(stderr, "./bin/inference_camera <(string) tflite model> <(float) confidence_threshold> <(float) iou_threshold>\n");
+    if (argc != 5) {
+        fprintf(stderr, "./bin/inference_camera <(string) tflite model> <(float) confidence_threshold> <(float) iou_threshold> <(int) od_mode: 1=multi, 2=person>\n");
         return 1;
     }
 
@@ -68,8 +68,20 @@ int main(int argc, char* argv[]) {
     float ave_whole_ms = 0;
     int num_threads = 4;
 
+    int od_mode = (int) std::stoi(argv[4]);
+
     const int y_pred_rows = 2268;
-  	const int y_pred_cols = 33;
+  	int y_pred_cols = 0;
+
+    switch (od_mode) {
+        case 1:
+            y_pred_cols = 33;
+            break;
+        case 2:
+            y_pred_cols = 14;
+            break;
+    }
+
     cv::Mat image;
     cv::Mat resized;
     Eigen::MatrixXf y_pred(y_pred_rows, y_pred_cols);
