@@ -6,10 +6,10 @@ MatrixXf decode_detections(const MatrixXf & y_pred, const float & confidence_thr
 	const int y_pred_cols = y_pred.cols();
 	const int y_raw_cols = y_pred_cols - 8;
 	const int n_classes = y_raw_cols-4;
-	
+
 	MatrixXf y_pred_decoded_raw(y_pred_rows,y_raw_cols);
 
-	
+
 
 	y_pred_decoded_raw = y_pred.block(0,0,y_pred_rows,y_raw_cols);
 	y_pred_decoded_raw.block(0,y_raw_cols-2,y_pred_rows,2) = (y_pred_decoded_raw.block(0,y_raw_cols-2,y_pred_rows,2).array() * y_pred.block(0,y_pred_cols-2,y_pred_rows,2).array()).exp();
@@ -31,7 +31,7 @@ MatrixXf decode_detections(const MatrixXf & y_pred, const float & confidence_thr
 		MatrixXf single_class(y_pred_rows,5);
 		single_class.col(0) = y_pred_decoded_raw.col(class_id);
 		single_class.block(0,1,y_pred_rows,4) = y_pred_decoded_raw.block(0,y_raw_cols-4,y_pred_rows,4);
-	  	
+
 		VectorXf Thresh_Met(y_pred_rows,1);
 		Thresh_Met = single_class.col(0);
 		Thresh_Met = (Thresh_Met.array() > confidence_thresh).select(Thresh_Met, 0);
@@ -56,7 +56,7 @@ MatrixXf decode_detections(const MatrixXf & y_pred, const float & confidence_thr
 		maxima_output.block(0,1,maxima_rows,5) = maxima;
 
 		if(maxima_rows!=0){
-			int pred_rows = pred.rows(); 		
+			int pred_rows = pred.rows();
 			pred.conservativeResize(pred_rows+maxima_rows,NoChange);
 			pred.block(pred_rows,0,maxima_rows,6) = maxima_output;
 		}
@@ -97,13 +97,13 @@ MatrixXf decode_detections(const MatrixXf & y_pred, const float & confidence_thr
     //   }
     // }
 
-	
+
 
 	return y_pred_decoded;
 }
 
 void draw_bounding_boxes(cv::Mat input, const Ref<const MatrixXf>& boxes){
-  //classificaions of the PASCAL VOC 2012 Dataset 
+  //classificaions of the PASCAL VOC 2012 Dataset
   string classNames[21] = {"background","aeroplane", "bicycle", "bird",
           "boat","bottle", "bus", "car", "cat",
            "chair", "cow", "diningtable", "dog",
@@ -137,13 +137,18 @@ void draw_bounding_boxes(cv::Mat input, const Ref<const MatrixXf>& boxes){
   }
 }
 
-void draw_bounding_boxes_save(cv::Mat input, const Ref<const MatrixXf>& boxes, string img_path){
-  //classificaions of the PASCAL VOC 2012 Dataset 
+void draw_bounding_boxes_save(cv::Mat input, const Ref<const MatrixXf>& boxes, string img_path, int mode){
+  //classificaions of the PASCAL VOC 2012 Dataset
   string classNames[21] = {"background","aeroplane", "bicycle", "bird",
           "boat","bottle", "bus", "car", "cat",
            "chair", "cow", "diningtable", "dog",
            "horse", "motorbike", "person", "pottedplant",
            "sheep", "sofa", "train", "tvmonitor"};
+
+	if (mode == 2)
+	{
+		classNames[1] = "person";
+	}
 
   //get number of bounding boxes
   int num_boxes = boxes.rows();
@@ -212,19 +217,19 @@ MatrixXf vectorized_nms(const MatrixXf & pred, const float & iou_threshold){
 
 
 	while (idxs.size() > 0){
-	
+
 		last = idxs.size() - 1;
 		i = idxs[last];
-		
+
 		// Remove last from idxs
 		VectorXi idxs_no_last;
 		idxs_no_last = idxs;
 		idxs_no_last.conservativeResize(idxs_no_last.rows()-1,NoChange);
-		
-		
+
+
 		append_int_eigen(pick, i);
 		// cout << "pick: " << pick << endl;
-		
+
 		VectorXf extracted_x1 = extract_values(x1, idxs_no_last);
 		VectorXf xx1 = max_eigen(x1, i, extracted_x1);
 
@@ -237,15 +242,15 @@ MatrixXf vectorized_nms(const MatrixXf & pred, const float & iou_threshold){
 		VectorXf extracted_y2 = extract_values(y2, idxs_no_last);
 		VectorXf yy2 = min_eigen(y2, i, extracted_y2);
 
-		
+
 
 		// Compute Height and Width
 		VectorXf w = (xx2 - xx1).array() + 1;
-		w = (w.array() >= 0).select(w, 0); 
-		
+		w = (w.array() >= 0).select(w, 0);
+
 		VectorXf h = (yy2 - yy1).array() + 1;
-		h = (h.array() >= 0).select(h, 0); 
-		
+		h = (h.array() >= 0).select(h, 0);
+
 
 		VectorXf extracted_area = extract_values(area, idxs_no_last);
 		VectorXf overlap = (w.array()*h.array()) / extracted_area.array();
@@ -275,7 +280,7 @@ MatrixXf vectorized_nms(const MatrixXf & pred, const float & iou_threshold){
 
 	// cout << "pick:\n" << pick << endl;
 	// cout << "pred shape: (" << pred.rows() << "," << pred.cols() << ")\n";
-	
+
 	int n_finalboxes = pick.rows();
 
 	MatrixXf filtered(n_finalboxes,5);
@@ -336,23 +341,23 @@ VectorXf extract_values(VectorXf & vec, VectorXi & idxs){
 VectorXf max_eigen(VectorXf & vec1, int & i, VectorXf & vec2){
 	VectorXf maxVec = vec2;
 	float x = vec1.data()[i];
-	maxVec = (maxVec.array() >= x).select(maxVec, x); 
+	maxVec = (maxVec.array() >= x).select(maxVec, x);
 	return maxVec;
 }
 
 VectorXf min_eigen(VectorXf & vec1, int & i, VectorXf & vec2){
 	VectorXf maxVec = vec2;
 	float x = vec1.data()[i];
-	maxVec = (maxVec.array() <= x).select(maxVec, x); 
+	maxVec = (maxVec.array() <= x).select(maxVec, x);
 	return maxVec;
 }
 // vector<Rect> VecBoxesToRectangles(const vector<vector<float>> & boxes)
 // {
 //   vector<Rect> rectangles;
 //   vector<float> box;
-  
+
 //   for (const auto & box: boxes)
 //     rectangles.push_back(Rect(Point(box[1], box[2]), Point(box[3], box[4])));
-  
+
 //   return rectangles;
 // }

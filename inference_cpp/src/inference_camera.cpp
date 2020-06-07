@@ -165,7 +165,7 @@ int main(int argc, char* argv[]) {
 
         auto end_inference = std::chrono::steady_clock::now();
 
-        draw_bounding_boxes(resized,vec_boxes);
+        draw_bounding_boxes(resized,vec_boxes,od_mode);
         cv::imshow("Camera View",resized);
 
         auto end_livestream = std::chrono::steady_clock::now();
