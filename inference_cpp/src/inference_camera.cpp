@@ -59,9 +59,13 @@ int main(int argc, char* argv[]) {
     char* filename = argv[1];
 
     int num_runs = 0;
+    float ave_loadtime_ms = 0;
     float ave_invoke_ms = 0;
+    float ave_predec_ms = 0;
+    float ave_decoding_ms = 0;
     float ave_inference_ms = 0;
-    float ave_livestream_ms = 0;
+    float ave_display_ms = 0;
+    float ave_whole_ms = 0;
     int num_threads = 4;
 
     const int y_pred_rows = 2268;
@@ -143,29 +147,43 @@ int main(int argc, char* argv[]) {
             }
         }
 
+        auto start_decoding = std::chrono::steady_clock::now();
+
         vec_boxes = decode_detections((Eigen::MatrixXf) y_pred, confidence_thresh, iou_thresh, top_k, image_height, image_width);
-        draw_bounding_boxes(resized,vec_boxes);
 
         auto end_inference = std::chrono::steady_clock::now();
 
+        draw_bounding_boxes(resized,vec_boxes);
         cv::imshow("Camera View",resized);
 
         auto end_livestream = std::chrono::steady_clock::now();
 
-        std::cout << "Time of invoke (ms/FPS): " << (float) std::chrono::duration_cast<std::chrono::milliseconds>(end_invoke - start_invoke).count() << " / " << 1000/(float)(std::chrono::duration_cast<std::chrono::milliseconds>(end_invoke - start_invoke).count()) << std::endl;
-        std::cout << "Time of inference (ms/FPS): " << (float) std::chrono::duration_cast<std::chrono::milliseconds>(end_inference - start_inference).count() << " / " << 1000/(float)(std::chrono::duration_cast<std::chrono::milliseconds>(end_inference - start_inference).count()) << std::endl;
-        std::cout << "Time of livestream (ms/FPS): " << (float) std::chrono::duration_cast<std::chrono::milliseconds>(end_livestream - start_inference).count() << " / " << 1000/(float)(std::chrono::duration_cast<std::chrono::milliseconds>(end_livestream - start_inference).count()) << std::endl;
+        //std::cout << "Time of invoke (ms/FPS): " << (float) std::chrono::duration_cast<std::chrono::milliseconds>(end_invoke - start_invoke).count() << " / " << 1000/(float)(std::chrono::duration_cast<std::chrono::milliseconds>(end_invoke - start_invoke).count()) << std::endl;
+        //std::cout << "Time of inference (ms/FPS): " << (float) std::chrono::duration_cast<std::chrono::milliseconds>(end_inference - start_inference).count() << " / " << 1000/(float)(std::chrono::duration_cast<std::chrono::milliseconds>(end_inference - start_inference).count()) << std::endl;
+        //std::cout << "Time of livestream (ms/FPS): " << (float) std::chrono::duration_cast<std::chrono::milliseconds>(end_livestream - start_inference).count() << " / " << 1000/(float)(std::chrono::duration_cast<std::chrono::milliseconds>(end_livestream - start_inference).count()) << std::endl;
+        std::cout << "Current total ms/FPS: " << (float) std::chrono::duration_cast<std::chrono::milliseconds>(end_livestream - start_inference).count() << " / " << 1000/(float)(std::chrono::duration_cast<std::chrono::milliseconds>(end_livestream - start_inference).count()) << std::endl;
+        ave_loadtime_ms += (float) std::chrono::duration_cast<std::chrono::milliseconds>(start_invoke - start_inference).count();
         ave_invoke_ms += (float) std::chrono::duration_cast<std::chrono::milliseconds>(end_invoke - start_invoke).count();
+        ave_predec_ms += (float) std::chrono::duration_cast<std::chrono::milliseconds>(start_decoding - end_invoke).count();
+        ave_decoding_ms += (float) std::chrono::duration_cast<std::chrono::milliseconds>(end_inference - start_decoding).count();
         ave_inference_ms += (float) std::chrono::duration_cast<std::chrono::milliseconds>(end_inference - start_inference).count();
-        ave_livestream_ms += (float) std::chrono::duration_cast<std::chrono::milliseconds>(end_livestream - start_inference).count();
+        ave_display_ms += (float) std::chrono::duration_cast<std::chrono::milliseconds>(end_livestream - end_inference).count();
+        ave_whole_ms += (float) std::chrono::duration_cast<std::chrono::milliseconds>(end_livestream - start_inference).count();
         num_runs += 1;
 
       if(cv::waitKey(30) >= 0) break;
     }
 
+    std::cout << "Average image load time (ms/FPS): " << (float)ave_loadtime_ms/num_runs << " / " << num_runs/((float)ave_loadtime_ms/1000) << std::endl;
     std::cout << "Average invoke time (ms/FPS): " << (float)ave_invoke_ms/num_runs << " / " << num_runs/((float)ave_invoke_ms/1000) << std::endl;
+    std::cout << "Average pre-decoding time (ms/FPS): " << (float)ave_predec_ms/num_runs << " / " << num_runs/((float)ave_predec_ms/1000) << std::endl;
+    std::cout << "Average decoding time (ms/FPS): " << (float)ave_decoding_ms/num_runs << " / " << num_runs/((float)ave_decoding_ms/1000) << std::endl;
+    std::cout << "Average display time (ms/FPS): " << (float)ave_display_ms/num_runs << " / " << num_runs/((float)ave_display_ms/1000) << std::endl << std::endl;
+
     std::cout << "Average inference time (ms/FPS): " << (float)ave_inference_ms/num_runs << " / " << num_runs/((float)ave_inference_ms/1000) << std::endl;
-    std::cout << "Average livestream time (ms/FPS): " << (float)ave_livestream_ms/num_runs << " / " << num_runs/((float)ave_livestream_ms/1000) << std::endl;
+    std::cout << "Average livestream time (ms/FPS): " << (float)ave_whole_ms/num_runs << " / " << num_runs/((float)ave_whole_ms/1000) << std::endl;
+
+
 
     return 0;
 }
