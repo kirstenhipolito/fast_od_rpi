@@ -289,8 +289,8 @@ int main(int argc, char* argv[]) {
     std::cout << "Average inference time (ms/FPS): " << (float)ave_inference_ms/num_runs << " / " << num_runs/((float)ave_inference_ms/1000) << std::endl;
 
     std::cout << "Average image load time (ms/FPS): " << (float)ave_loadtime_ms/num_runs << " / " << num_runs/((float)ave_loadtime_ms/1000) << std::endl;
-    std::cout << "Average pre-decoding time (ms/FPS): " << (float)ave_predec_ms/num_runs << " / " << num_runs/((float)ave_predec_ms/1000) << std::endl;
-    std::cout << "Average decoding time (ms/FPS): " << (float)ave_decoding_ms/num_runs << " / " << num_runs/((float)ave_decoding_ms/1000) << std::endl;
+    std::cout << "Average pre-decoding (output extract) time (ms/FPS): " << (float)ave_predec_ms/num_runs << " / " << num_runs/((float)ave_predec_ms/1000) << std::endl;
+    std::cout << "Average decoding (NMS + draw) time (ms/FPS): " << (float)ave_decoding_ms/num_runs << " / " << num_runs/((float)ave_decoding_ms/1000) << std::endl;
 
     std::cout << std::endl;
     return 0;
