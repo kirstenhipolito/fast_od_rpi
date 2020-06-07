@@ -105,8 +105,13 @@ int main(int argc, char* argv[]) {
     std::cout << "Using model: " << filename << std::endl;
 
     int num_runs = 50;
+    float ave_loadtime_ms = 0;
     float ave_invoke_ms = 0;
+    float ave_predec_ms = 0;
+    float ave_decoding_ms = 0;
     float ave_inference_ms = 0;
+    float ave_display_ms = 0;
+    float ave_whole_ms = 0;
     int num_threads = 4;
 
     const int y_pred_rows = 2268;
@@ -226,9 +231,9 @@ int main(int argc, char* argv[]) {
     std::cout << std::setprecision(6);
 
     for (int i = 0; i < num_runs; i++) {
-        img_path = img_path_vec[i];
-
         auto start_inference = std::chrono::steady_clock::now();
+
+        img_path = img_path_vec[i];
 
         // Fill input buffers, resize image and load into input
         image = cv::imread(img_path, cv::IMREAD_COLOR);
@@ -236,7 +241,6 @@ int main(int argc, char* argv[]) {
             std::cout << "Could not read the image: " << img_path << std::endl;
         }
         cv::resize(image, resized, cv::Size(image_width,image_height));
-        // memcpy(interpreter->typed_input_tensor<float>(0), image.data, image.total() * image.elemSize());
         fill_buffer_with_mat(resized,interpreter->typed_input_tensor<float>(0),image_height,image_width,image_channels);
 
         auto start_invoke = std::chrono::steady_clock::now();
@@ -244,7 +248,6 @@ int main(int argc, char* argv[]) {
         // Run inference
         TFLITE_MINIMAL_CHECK(interpreter->Invoke() == kTfLiteOk);
 
-        // Get end clock
         auto end_invoke = std::chrono::steady_clock::now();
 
         // Get output, decode, and draw bounding boxes
@@ -259,26 +262,36 @@ int main(int argc, char* argv[]) {
             }
         }
 
+        auto start_decoding = std::chrono::steady_clock::now();
+
         vec_boxes = decode_detections((Eigen::MatrixXf) y_pred, confidence_thresh, iou_thresh, top_k, image_height, image_width);
-        
 
         img_save_name = "out/"+(img_path.substr(img_path.find_last_of("/") + 1)); 
-
         draw_bounding_boxes_save(resized,vec_boxes, img_save_name);
 
         auto end_inference = std::chrono::steady_clock::now();
+        
         std::cout << "Image: \n" << img_path << std::endl;
         std::cout << "Vec boxes: \n" << vec_boxes << std::endl;
         std::cout << "Time of invoke (ms/FPS): " << (float) std::chrono::duration_cast<std::chrono::milliseconds>(end_invoke - start_invoke).count() << " / " << 1000/(float)(std::chrono::duration_cast<std::chrono::milliseconds>(end_invoke - start_invoke).count()) << std::endl;
         std::cout << "Time of inference (ms/FPS): " << (float) std::chrono::duration_cast<std::chrono::milliseconds>(end_inference - start_inference).count() << " / " << 1000/(float)(std::chrono::duration_cast<std::chrono::milliseconds>(end_inference - start_inference).count()) << std::endl;
+        std::cout << "Time of NMS (ms/FPS): " << (float) std::chrono::duration_cast<std::chrono::milliseconds>(end_inference - start_decoding).count() << " / " << 1000/(float)(std::chrono::duration_cast<std::chrono::milliseconds>(end_inference - start_decoding).count()) << std::endl;
         std::cout << std::endl;
         ave_invoke_ms += (float) std::chrono::duration_cast<std::chrono::milliseconds>(end_invoke - start_invoke).count();
         ave_inference_ms += (float) std::chrono::duration_cast<std::chrono::milliseconds>(end_inference - start_inference).count();
+        ave_loadtime_ms += (float) std::chrono::duration_cast<std::chrono::milliseconds>(start_invoke - start_inference).count();
+        ave_predec_ms += (float) std::chrono::duration_cast<std::chrono::milliseconds>(start_decoding - end_invoke).count();
+        ave_decoding_ms += (float) std::chrono::duration_cast<std::chrono::milliseconds>(end_inference - start_decoding).count();
 
     }
 
     std::cout << "Average invoke time (ms/FPS): " << (float)ave_invoke_ms/num_runs << " / " << num_runs/((float)ave_invoke_ms/1000) << std::endl;
     std::cout << "Average inference time (ms/FPS): " << (float)ave_inference_ms/num_runs << " / " << num_runs/((float)ave_inference_ms/1000) << std::endl;
+
+    std::cout << "Average image load time (ms/FPS): " << (float)ave_loadtime_ms/num_runs << " / " << num_runs/((float)ave_loadtime_ms/1000) << std::endl;
+    std::cout << "Average pre-decoding time (ms/FPS): " << (float)ave_predec_ms/num_runs << " / " << num_runs/((float)ave_predec_ms/1000) << std::endl;
+    std::cout << "Average decoding time (ms/FPS): " << (float)ave_decoding_ms/num_runs << " / " << num_runs/((float)ave_decoding_ms/1000) << std::endl;
+
     std::cout << std::endl;
     return 0;
 }
