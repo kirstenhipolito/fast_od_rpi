@@ -279,7 +279,7 @@ int main(int argc, char* argv[]) {
         vec_boxes = decode_detections((Eigen::MatrixXf) y_pred, confidence_thresh, iou_thresh, top_k, image_height, image_width);
 
         img_save_name = "out/"+(img_path.substr(img_path.find_last_of("/") + 1)); 
-        draw_bounding_boxes_save(resized,vec_boxes, img_save_name);
+        draw_bounding_boxes_save(resized,vec_boxes, img_save_name,od_mode);
 
         auto end_inference = std::chrono::steady_clock::now();
         
