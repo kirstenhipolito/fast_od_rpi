@@ -136,7 +136,7 @@ int main(int argc, char* argv[]) {
     std::cout << "Press any key to end." << "\n";
     std::cout << std::fixed;
     std::cout << std::setprecision(6);
-    cv::namedWindow("Video View", cv::WINDOW_AUTOSIZE);
+    // cv::namedWindow("Video View", cv::WINDOW_AUTOSIZE);
 
     while(1)
     {
@@ -177,7 +177,7 @@ int main(int argc, char* argv[]) {
         auto end_inference = std::chrono::steady_clock::now();
 
         draw_bounding_boxes(resized,vec_boxes,od_mode);
-        cv::imshow("Video View",resized);
+        // cv::imshow("Video View",resized);
 
         video_write.write(resized);
 
