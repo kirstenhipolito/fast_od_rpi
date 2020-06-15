@@ -136,7 +136,7 @@ void draw_bounding_boxes(cv::Mat input, const Ref<const MatrixXf>& boxes, int mo
     cv::Point confPoint = cv::Point(boxes(i,2),boxes(i,3) - confPointOffset);
     cv::Point classPoint = cv::Point(boxes(i,2),boxes(i,3) - classPointOffset);
 
-    cv::rectangle(input, topleft, bottomright, cv::Scalar(0,0,255));
+    cv::rectangle(input, topleft, bottomright, cv::Scalar(0,0,255), 3);
     cv::putText(input,classNames[classIndex],classPoint,cv::FONT_HERSHEY_SIMPLEX,textScale,cv::Scalar(0,0,255));
     cv::putText(input,confidenceValue,confPoint,cv::FONT_HERSHEY_SIMPLEX,textScale,cv::Scalar(0,0,255));
   }
@@ -180,7 +180,7 @@ void draw_bounding_boxes_custom_dim(cv::Mat input, const Ref<const MatrixXf>& bo
     cv::Point bottomright = cv::Point(boxes(i,4)*frame_width_multiplier,boxes(i,5)*frame_height_multiplier);
 
     cv::Point confPoint = cv::Point(boxes(i,2)*frame_width_multiplier,boxes(i,3)*frame_height_multiplier - confPointOffset);
-    cv::Point classPoint = cv::Point(boxes(i,4)*frame_width_multiplier,boxes(i,5)*frame_height_multiplier - classPointOffset);
+    cv::Point classPoint = cv::Point(boxes(i,2)*frame_width_multiplier,boxes(i,3)*frame_height_multiplier - classPointOffset);
 
     cv::rectangle(input, topleft, bottomright, cv::Scalar(0,0,255),3);
     cv::putText(input,classNames[classIndex],classPoint,cv::FONT_HERSHEY_SIMPLEX,textScale,cv::Scalar(0,0,255));
