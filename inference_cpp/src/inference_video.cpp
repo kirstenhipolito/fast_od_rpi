@@ -172,12 +172,12 @@ int main(int argc, char* argv[]) {
 
         auto start_decoding = std::chrono::steady_clock::now();
 
-        vec_boxes = decode_detections((Eigen::MatrixXf) y_pred, confidence_thresh, iou_thresh, top_k, frame_height, frame_width);
+        vec_boxes = decode_detections((Eigen::MatrixXf) y_pred, confidence_thresh, iou_thresh, top_k, image_height, image_width);
 
         auto end_inference = std::chrono::steady_clock::now();
 
-        draw_bounding_boxes(image,vec_boxes,od_mode);
-        // draw_bounding_boxes_custom_dim(image,vec_boxes,od_mode,frame_width,frame_height);
+        // draw_bounding_boxes(image,vec_boxes,od_mode);
+        draw_bounding_boxes_custom_dim(image,vec_boxes,od_mode,frame_width,frame_height);
         // cv::imshow("Video View",resized);
 
         video_write.write(image);
