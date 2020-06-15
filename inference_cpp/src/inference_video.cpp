@@ -110,7 +110,7 @@ int main(int argc, char* argv[]) {
     // int frame_width = video.get(cv::CV_CAP_PROP_FRAME_WIDTH); 
     // int frame_height = video.get(cv::CV_CAP_PROP_FRAME_HEIGHT); 
 
-    cv::VideoWriter video_write("out_vid.avi",cv::CV_FOURCC('M','J','P','G'),10, Size(image_width,image_height));
+    cv::VideoWriter video_write("out_vid.avi",cv::VideoWriter::fourcc('M','J','P','G'),10, Size(image_width,image_height));
 
     // Load model
     std::unique_ptr<tflite::FlatBufferModel> model = tflite::FlatBufferModel::BuildFromFile(filename);
