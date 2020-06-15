@@ -107,8 +107,8 @@ int main(int argc, char* argv[]) {
          return -1;
     }
 
-    // int frame_width = video.get(cv::CV_CAP_PROP_FRAME_WIDTH); 
-    // int frame_height = video.get(cv::CV_CAP_PROP_FRAME_HEIGHT); 
+    int frame_width = video.get(cv::CAP_PROP_FRAME_WIDTH); 
+    int frame_height = video.get(cv::CAP_PROP_FRAME_HEIGHT); 
 
     cv::VideoWriter video_write("out_vid.avi",cv::VideoWriter::fourcc('M','J','P','G'),10, Size(image_width,image_height));
 
@@ -176,10 +176,10 @@ int main(int argc, char* argv[]) {
 
         auto end_inference = std::chrono::steady_clock::now();
 
-        draw_bounding_boxes(resized,vec_boxes,od_mode);
+        draw_bounding_boxes_custom_dim(image,vec_boxes,od_mode,frame_width,frame_height);
         // cv::imshow("Video View",resized);
 
-        video_write.write(resized);
+        video_write.write(image);
 
         auto end_livestream = std::chrono::steady_clock::now();
 
